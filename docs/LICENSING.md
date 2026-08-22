@@ -29,7 +29,9 @@ Bu nedenle proje GPLv3 altında dağıtılır. Google Play'de yayınlamak için
 - [ ] Depo herkese açık hâle getirilir (`shellnoq` hesabı altında)
 - [ ] Mağaza listelemesinin "Geliştirici web sitesi" alanına depo bağlantısı
       konur
-- [ ] GPLv3 tam metni depo kökündeki `LICENSE` dosyasına eklenir
+- [x] GPLv3 tam metni depo kökündeki `LICENSE` dosyasına eklendi
+      (gnu.org'daki kanonik metin, 23 Ağustos 2026)
+- [x] Telif ve lisans bildirimi `README.md` içine yazıldı
 - [ ] Uygulama içi "Lisanslar" ekranı (Ayarlar → Lisanslar) kontrol edilir;
       Stockfish ve tüm bağımlılıklar orada listelenir
 

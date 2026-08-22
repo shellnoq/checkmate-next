@@ -54,9 +54,23 @@ Tasarımın iki taşıyıcı fikri var:
 
 ## Lisans
 
-Uygulama Stockfish satranç motorunu içerir; Stockfish GPLv3 ile lisanslıdır ve
-bu lisans tüm dağıtımı kapsar. Proje bu nedenle **GPLv3** altında dağıtılır ve
-kaynak kodu herkese açıktır. Ayrıntılar: `docs/LICENSING.md`.
+Copyright (C) 2026 Aleaddin Özer
+
+Bu program özgür yazılımdır: Free Software Foundation tarafından yayımlanan GNU
+Genel Kamu Lisansı'nın 3. sürümü ya da (tercihinize bağlı olarak) daha sonraki
+herhangi bir sürümü koşulları altında yeniden dağıtabilir ve/veya
+değiştirebilirsiniz.
+
+Bu program faydalı olacağı umuduyla dağıtılmaktadır, ancak HİÇBİR GARANTİ
+VERİLMEZ; SATILABİLİRLİK ya da BELİRLİ BİR AMACA UYGUNLUK zımni garantileri de
+dâhil olmak üzere. Ayrıntılar için GNU Genel Kamu Lisansı'na bakınız.
+
+Lisansın bir kopyası depo kökündeki `LICENSE` dosyasındadır; ayrıca
+<https://www.gnu.org/licenses/> adresinden edinilebilir.
+
+Uygulama Stockfish satranç motorunu içerir; Stockfish de GPLv3 ile lisanslıdır
+ve bu lisans tüm dağıtımı kapsar. Yükümlülüklerin ayrıntısı:
+`docs/LICENSING.md`.
 
 ## Belgeler
 

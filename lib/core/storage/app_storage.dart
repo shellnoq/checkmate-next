@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
 /// Uygulamanın tüm kalıcı verisi.
@@ -71,4 +72,9 @@ class AppStorage {
   static Future<void> setStat(String key, int value) => _stats.put(key, value);
 
   static Future<void> resetStats() => _stats.clear();
+
+  /// İstatistik kutusunun değişimlerini dinlemek için. Ana ekran bunu kullanır;
+  /// böylece oyun bitip istatistik güncellendiğinde panel kendiliğinden
+  /// tazelenir.
+  static ValueListenable<Box> statsListenable() => _stats.listenable();
 }

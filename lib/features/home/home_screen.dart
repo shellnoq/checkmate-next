@@ -8,11 +8,16 @@ import '../../core/l10n/strings.dart';
 import '../../core/storage/app_storage.dart';
 import '../board/piece_widget.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
     final s = S.of(context);
     final settings = ref.watch(settingsProvider);
     final theme = Theme.of(context);
@@ -256,6 +261,14 @@ class _StatsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Kutu dinlenir: oyun bitince istatistikler kendiliğinden tazelenir.
+    return ValueListenableBuilder(
+      valueListenable: AppStorage.statsListenable(),
+      builder: (context, _, _) => _buildPanel(context),
+    );
+  }
+
+  Widget _buildPanel(BuildContext context) {
     final theme = Theme.of(context);
     final wins = AppStorage.statOf('wins');
     final losses = AppStorage.statOf('losses');

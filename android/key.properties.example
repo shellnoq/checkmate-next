@@ -1,0 +1,12 @@
+# Yayın imzası için şablon. Gerçek dosyanın adı `key.properties` olmalı ve
+# sürüm kontrolüne GİRMEMELİDİR (.gitignore kapsamındadır).
+#
+# Keystore üretimi:
+#   keytool -genkey -v -keystore ~/satranc-release.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias satranc
+#
+storePassword=KEYSTORE_PAROLASI
+keyPassword=ANAHTAR_PAROLASI
+keyAlias=satranc
+# Mutlak yol ya da android/ klasörüne göreli yol.
+storeFile=/Users/KULLANICI/satranc-release.jks

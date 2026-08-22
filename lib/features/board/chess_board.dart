@@ -177,15 +177,13 @@ class _ChessBoardState extends State<ChessBoard> {
             behavior: HitTestBehavior.opaque,
             onTapUp: widget.interactive
                 ? (details) {
-                    final square =
-                        _squareAt(details.localPosition, squareSize);
+                    final square = _squareAt(details.localPosition, squareSize);
                     if (square != null) widget.onSquareTap?.call(square);
                   }
                 : null,
             onPanStart: widget.interactive
                 ? (details) {
-                    final square =
-                        _squareAt(details.localPosition, squareSize);
+                    final square = _squareAt(details.localPosition, squareSize);
                     if (square == null) return;
                     if (widget.position.board.pieceAt(square) == null) return;
                     setState(() {
@@ -218,9 +216,9 @@ class _ChessBoardState extends State<ChessBoard> {
                 : null,
             onPanCancel: widget.interactive
                 ? () => setState(() {
-                      _dragFrom = null;
-                      _dragPosition = null;
-                    })
+                    _dragFrom = null;
+                    _dragPosition = null;
+                  })
                 : null,
             child: Stack(
               clipBehavior: Clip.none,
@@ -273,8 +271,9 @@ class _ChessBoardState extends State<ChessBoard> {
       overlay = theme.lastMove;
     }
 
-    final coordinateColor =
-        isLight ? theme.coordinateOnLight : theme.coordinateOnDark;
+    final coordinateColor = isLight
+        ? theme.coordinateOnLight
+        : theme.coordinateOnDark;
 
     return SizedBox(
       width: size,
@@ -393,11 +392,7 @@ class _ChessBoardState extends State<ChessBoard> {
       left: _dragPosition!.dx - size / 2,
       top: _dragPosition!.dy - size * 0.75,
       child: IgnorePointer(
-        child: PieceWidget(
-          piece: piece,
-          size: size,
-          pieceSet: widget.pieceSet,
-        ),
+        child: PieceWidget(piece: piece, size: size, pieceSet: widget.pieceSet),
       ),
     );
   }
@@ -437,10 +432,7 @@ class _HintArrowPainter extends CustomPainter {
       (from.$2 + 0.5) * squareSize,
       (from.$1 + 0.5) * squareSize,
     );
-    final end = Offset(
-      (to.$2 + 0.5) * squareSize,
-      (to.$1 + 0.5) * squareSize,
-    );
+    final end = Offset((to.$2 + 0.5) * squareSize, (to.$1 + 0.5) * squareSize);
 
     final direction = (end - start);
     final length = direction.distance;

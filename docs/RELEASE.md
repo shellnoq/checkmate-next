@@ -20,12 +20,21 @@ keyAlias=satranc
 storeFile=/Users/KULLANICI/satranc-release.jks
 ```
 
-`key.properties` ve `*.jks` `.gitignore` kapsamındadır; depoya girmez.
+Keystore deponun dışında, kullanıcı dizininde tutulur. `key.properties` ve
+`*.jks` `.gitignore` kapsamındadır; ikisi de depoya girmez.
 Dosya yoksa yayın derlemesi hata ver­mez, hata ayıklama anahtarıyla imzalar —
 bu paket **Play'e yüklenemez**, yalnızca yerel denemeler içindir.
 
 Play App Signing kullanılacaksa (önerilir) yükleme anahtarı budur; dağıtım
 anahtarını Google yönetir.
+
+Mevcut yükleme anahtarı 4096-bit RSA'dır ve 2054'e kadar geçerlidir. Paketin
+hangi sertifikayla imzalandığını doğrulamak için:
+
+```bash
+unzip -p build/app/outputs/bundle/release/app-release.aab 'META-INF/*.RSA' \
+  | keytool -printcert
+```
 
 ## 2. Sürüm numarası
 

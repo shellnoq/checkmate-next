@@ -47,7 +47,8 @@ class PieceSvg {
       '<rect x="9.2" y="38.6" width="26.6" height="4.4" rx="2.2"/>';
 
   /// Tabandan gövdeye geçen etek.
-  static const _skirt = '<path d="M12.6 30.8h19.8c1.4 4.2 2.7 6.5 3.9 8.1H8.7'
+  static const _skirt =
+      '<path d="M12.6 30.8h19.8c1.4 4.2 2.7 6.5 3.9 8.1H8.7'
       'c1.2-1.6 2.5-3.9 3.9-8.1z"/>';
 
   /// Gövde ile eteği ayıran bilezik.

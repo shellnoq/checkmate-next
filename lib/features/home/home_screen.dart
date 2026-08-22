@@ -81,8 +81,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Text(
                       'Stockfish',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant
-                            .withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.6,
+                        ),
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -193,7 +194,9 @@ class _ModeCard extends StatelessWidget {
                   ),
                   child: Icon(
                     icon,
-                    color: highlighted ? scheme.primary : scheme.onSurfaceVariant,
+                    color: highlighted
+                        ? scheme.primary
+                        : scheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -218,7 +221,9 @@ class _ModeCard extends StatelessWidget {
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: scheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(20),
@@ -236,8 +241,9 @@ class _ModeCard extends StatelessWidget {
                         subtitle,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: highlighted
-                              ? scheme.onPrimaryContainer
-                                  .withValues(alpha: 0.75)
+                              ? scheme.onPrimaryContainer.withValues(
+                                  alpha: 0.75,
+                                )
                               : scheme.onSurfaceVariant,
                         ),
                       ),

@@ -23,10 +23,10 @@ class GameController extends ChangeNotifier {
     required MatchTransport transport,
     ChessEngine? analysisEngine,
     this.analysisEnabled = true,
-  })  : _transport = transport,
-        _analysisEngine = analysisEngine,
-        _position = _positionFromFen(config.startingFen),
-        clock = ChessClock(config.timeControl) {
+  }) : _transport = transport,
+       _analysisEngine = analysisEngine,
+       _position = _positionFromFen(config.startingFen),
+       clock = ChessClock(config.timeControl) {
     clock
       ..onTick = _onClockTick
       ..onFlag = _onFlag;
@@ -266,10 +266,9 @@ class GameController extends ChangeNotifier {
     final applied = _applyMove(uiMove);
     if (!applied) return;
 
-    _transport.send(SubmitMove(
-      uci: wireUci,
-      remainingMs: remaining?.inMilliseconds,
-    ));
+    _transport.send(
+      SubmitMove(uci: wireUci, remainingMs: remaining?.inMilliseconds),
+    );
   }
 
   /// Rok hamlesini standart UCI biçimine çevirir.
@@ -313,15 +312,17 @@ class GameController extends ChangeNotifier {
       clock.switchTo(_position.turn);
     }
 
-    _moves.add(MoveRecord(
-      uci: wireUci,
-      san: san,
-      fenAfter: _position.fen,
-      side: mover,
-      clockAfter: config.timeControl.isUnlimited
-          ? null
-          : clock.remainingOf(mover),
-    ));
+    _moves.add(
+      MoveRecord(
+        uci: wireUci,
+        san: san,
+        fenAfter: _position.fen,
+        side: mover,
+        clockAfter: config.timeControl.isUnlimited
+            ? null
+            : clock.remainingOf(mover),
+      ),
+    );
     _browseIndex = _moves.length;
     _selected = null;
     _hintUci = null;
@@ -340,10 +341,9 @@ class GameController extends ChangeNotifier {
     final loser = config.kind == MatchKind.passAndPlay
         ? _position.turn
         : config.localSide;
-    _finish(GameResult(
-      reason: GameEndReason.resignation,
-      winner: loser.opposite,
-    ));
+    _finish(
+      GameResult(reason: GameEndReason.resignation, winner: loser.opposite),
+    );
     await _transport.send(const ResignMatch());
   }
 
@@ -455,13 +455,16 @@ class GameController extends ChangeNotifier {
         _undoPlies(plies);
       case MatchEnded(:final reason, :final winner):
         if (_phase == GamePhase.playing) {
-          _finish(GameResult(
-            reason: reason,
-            winner: winner ??
-                (reason == GameEndReason.resignation
-                    ? config.localSide.opposite
-                    : null),
-          ));
+          _finish(
+            GameResult(
+              reason: reason,
+              winner:
+                  winner ??
+                  (reason == GameEndReason.resignation
+                      ? config.localSide.opposite
+                      : null),
+            ),
+          );
         }
       case MatchConnectionChanged():
         notifyListeners();
@@ -497,8 +500,8 @@ class GameController extends ChangeNotifier {
       final reason = _position.isCheckmate
           ? GameEndReason.checkmate
           : _position.isStalemate
-              ? GameEndReason.stalemate
-              : GameEndReason.insufficientMaterial;
+          ? GameEndReason.stalemate
+          : GameEndReason.insufficientMaterial;
       _finish(GameResult(reason: reason, winner: outcome.winner));
       return;
     }
@@ -516,10 +519,12 @@ class GameController extends ChangeNotifier {
     // FIDE 6.9: rakipte mat yapacak materyal yoksa süre bitişi beraberliktir.
     final winner = loser.opposite;
     final winnerCanMate = !_position.hasInsufficientMaterial(winner);
-    _finish(GameResult(
-      reason: GameEndReason.timeout,
-      winner: winnerCanMate ? winner : null,
-    ));
+    _finish(
+      GameResult(
+        reason: GameEndReason.timeout,
+        winner: winnerCanMate ? winner : null,
+      ),
+    );
   }
 
   void _finish(GameResult result) {
@@ -595,7 +600,8 @@ class GameController extends ChangeNotifier {
   String toPgn({String? event, String? white, String? black, DateTime? date}) {
     final buffer = StringBuffer();
     final stamp = date ?? DateTime.now();
-    final dateTag = '${stamp.year}.'
+    final dateTag =
+        '${stamp.year}.'
         '${stamp.month.toString().padLeft(2, '0')}.'
         '${stamp.day.toString().padLeft(2, '0')}';
 
@@ -611,8 +617,10 @@ class GameController extends ChangeNotifier {
       buffer.writeln('[FEN "${config.startingFen}"]');
     }
     if (!config.timeControl.isUnlimited) {
-      buffer.writeln('[TimeControl "${config.timeControl.initial.inSeconds}'
-          '+${config.timeControl.increment.inSeconds}"]');
+      buffer.writeln(
+        '[TimeControl "${config.timeControl.initial.inSeconds}'
+        '+${config.timeControl.increment.inSeconds}"]',
+      );
     }
     buffer.writeln();
 

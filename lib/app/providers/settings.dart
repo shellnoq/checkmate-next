@@ -53,42 +53,45 @@ class AppSettings {
     bool? autoQueenPromotion,
     DifficultyLevel? lastDifficulty,
     TimeControl? lastTimeControl,
-  }) =>
-      AppSettings(
-        locale: locale ?? this.locale,
-        themeMode: themeMode ?? this.themeMode,
-        boardTheme: boardTheme ?? this.boardTheme,
-        pieceSet: pieceSet ?? this.pieceSet,
-        soundEnabled: soundEnabled ?? this.soundEnabled,
-        hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
-        showCoordinates: showCoordinates ?? this.showCoordinates,
-        showLegalMoves: showLegalMoves ?? this.showLegalMoves,
-        showEvaluation: showEvaluation ?? this.showEvaluation,
-        autoQueenPromotion: autoQueenPromotion ?? this.autoQueenPromotion,
-        lastDifficulty: lastDifficulty ?? this.lastDifficulty,
-        lastTimeControl: lastTimeControl ?? this.lastTimeControl,
-      );
+  }) => AppSettings(
+    locale: locale ?? this.locale,
+    themeMode: themeMode ?? this.themeMode,
+    boardTheme: boardTheme ?? this.boardTheme,
+    pieceSet: pieceSet ?? this.pieceSet,
+    soundEnabled: soundEnabled ?? this.soundEnabled,
+    hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
+    showCoordinates: showCoordinates ?? this.showCoordinates,
+    showLegalMoves: showLegalMoves ?? this.showLegalMoves,
+    showEvaluation: showEvaluation ?? this.showEvaluation,
+    autoQueenPromotion: autoQueenPromotion ?? this.autoQueenPromotion,
+    lastDifficulty: lastDifficulty ?? this.lastDifficulty,
+    lastTimeControl: lastTimeControl ?? this.lastTimeControl,
+  );
 
   static AppSettings load() => AppSettings(
-        locale: Locale(AppStorage.get<String>('locale', 'tr')),
-        themeMode: switch (AppStorage.get<String>('themeMode', 'system')) {
-          'light' => ThemeMode.light,
-          'dark' => ThemeMode.dark,
-          _ => ThemeMode.system,
-        },
-        boardTheme: BoardTheme.fromId(AppStorage.get<String>('boardTheme', 'walnut')),
-        pieceSet: PieceSet.fromId(AppStorage.get<String>('pieceSet', 'classic')),
-        soundEnabled: AppStorage.get<bool>('sound', true),
-        hapticsEnabled: AppStorage.get<bool>('haptics', true),
-        showCoordinates: AppStorage.get<bool>('coordinates', true),
-        showLegalMoves: AppStorage.get<bool>('legalMoves', true),
-        showEvaluation: AppStorage.get<bool>('evaluation', true),
-        autoQueenPromotion: AppStorage.get<bool>('autoQueen', false),
-        lastDifficulty:
-            DifficultyLevel.fromId(AppStorage.get<String>('difficulty', 'club')),
-        lastTimeControl:
-            TimeControl.fromId(AppStorage.get<String>('timeControl', 'rapid10')),
-      );
+    locale: Locale(AppStorage.get<String>('locale', 'tr')),
+    themeMode: switch (AppStorage.get<String>('themeMode', 'system')) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
+    },
+    boardTheme: BoardTheme.fromId(
+      AppStorage.get<String>('boardTheme', 'walnut'),
+    ),
+    pieceSet: PieceSet.fromId(AppStorage.get<String>('pieceSet', 'classic')),
+    soundEnabled: AppStorage.get<bool>('sound', true),
+    hapticsEnabled: AppStorage.get<bool>('haptics', true),
+    showCoordinates: AppStorage.get<bool>('coordinates', true),
+    showLegalMoves: AppStorage.get<bool>('legalMoves', true),
+    showEvaluation: AppStorage.get<bool>('evaluation', true),
+    autoQueenPromotion: AppStorage.get<bool>('autoQueen', false),
+    lastDifficulty: DifficultyLevel.fromId(
+      AppStorage.get<String>('difficulty', 'club'),
+    ),
+    lastTimeControl: TimeControl.fromId(
+      AppStorage.get<String>('timeControl', 'rapid10'),
+    ),
+  );
 }
 
 class SettingsController extends StateNotifier<AppSettings> {
@@ -145,7 +148,9 @@ class SettingsController extends StateNotifier<AppSettings> {
   }
 
   Future<void> rememberSetup(
-      DifficultyLevel difficulty, TimeControl timeControl) async {
+    DifficultyLevel difficulty,
+    TimeControl timeControl,
+  ) async {
     state = state.copyWith(
       lastDifficulty: difficulty,
       lastTimeControl: timeControl,
@@ -155,6 +160,6 @@ class SettingsController extends StateNotifier<AppSettings> {
   }
 }
 
-final settingsProvider =
-    StateNotifierProvider<SettingsController, AppSettings>(
-        (ref) => SettingsController());
+final settingsProvider = StateNotifierProvider<SettingsController, AppSettings>(
+  (ref) => SettingsController(),
+);

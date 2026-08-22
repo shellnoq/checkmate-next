@@ -46,8 +46,11 @@ class _MoveTableState extends State<MoveTable> {
   void _scrollToCurrent() {
     if (!_controller.hasClients) return;
     final row = ((widget.currentIndex - 1) ~/ 2).clamp(0, 1 << 30);
-    final target = (row * _rowHeight - _controller.position.viewportDimension / 2)
-        .clamp(0.0, _controller.position.maxScrollExtent);
+    final target =
+        (row * _rowHeight - _controller.position.viewportDimension / 2).clamp(
+          0.0,
+          _controller.position.maxScrollExtent,
+        );
     _controller.animateTo(
       target,
       duration: const Duration(milliseconds: 220),
@@ -89,8 +92,9 @@ class _MoveTableState extends State<MoveTable> {
           height: _rowHeight,
           color: row.isEven
               ? Colors.transparent
-              : theme.colorScheme.surfaceContainerHighest
-                  .withValues(alpha: 0.35),
+              : theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.35,
+                ),
           child: Row(
             children: [
               SizedBox(

@@ -51,7 +51,7 @@ class AppStorage {
           {
             ...jsonDecode(_archive.get(key) as String) as Map<String, Object?>,
             '_key': key,
-          }
+          },
     ];
   }
 

@@ -1,7 +1,20 @@
-# Satranç Ustası
+# Satranç Ustası · Chess Master
+
+[![CI](https://github.com/shellnoq/chess-master/actions/workflows/ci.yml/badge.svg)](https://github.com/shellnoq/chess-master/actions/workflows/ci.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-3.41-blue.svg)](https://flutter.dev)
+[![Engine](https://img.shields.io/badge/engine-Stockfish-green.svg)](https://stockfishchess.org)
 
 Stockfish motoruyla çalışan, sekiz zorluk kademeli profesyonel satranç
-uygulaması. Flutter ile yazılmıştır; Android ve iOS hedeflenir.
+uygulaması. Flutter ile yazılmıştır; Android ve iOS hedeflenir. Motor cihazda
+çalışır, internet bağlantısı gerekmez.
+
+*A chess app powered by Stockfish running fully on-device, with eight
+difficulty levels from ~600 Elo to full engine strength. Turkish and English.*
+
+| Ana ekran | Oyun ekranı |
+|---|---|
+| <img src="docs/screenshots/home.png" width="270"> | <img src="docs/screenshots/game.png" width="270"> |
 
 ## Öne çıkanlar
 
@@ -22,11 +35,18 @@ uygulaması. Flutter ile yazılmıştır; Android ve iOS hedeflenir.
 ```bash
 flutter pub get          # bağımlılıklar
 flutter analyze          # statik çözümleme
-flutter test             # birim testleri
+flutter test             # birim ve altın görüntü testleri
+flutter test --exclude-tags golden   # altın görüntüler hariç (CI'ın koştuğu)
 flutter run              # cihaz/emülatörde çalıştır
 flutter build appbundle --release   # Play Store paketi
 dart run flutter_launcher_icons     # uygulama ikonlarını üret
+
+# Gerçek cihazda motoru doğrula (cihaz bağlıyken)
+flutter test integration_test/engine_test.dart -d <cihaz-id>
 ```
+
+Altın görüntü testleri macOS'ta üretilmiş referanslara dayanır; referansları
+yenilemek için `flutter test --update-goldens`.
 
 ## Katman düzeni
 

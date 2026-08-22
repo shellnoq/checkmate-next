@@ -15,10 +15,11 @@ class MatchTransportFactory {
   final ChessEngine _engine;
 
   MatchTransport create(MatchKind kind) => switch (kind) {
-        MatchKind.engine => EngineMatchTransport(_engine),
-        MatchKind.passAndPlay => LocalMatchTransport(),
-        MatchKind.online => throw UnsupportedError(
-            'Online mod henüz etkin değil. RemoteMatchTransport bir '
-            'MessageChannel gerçeklemesi ile bağlandığında bu dal açılacak.'),
-      };
+    MatchKind.engine => EngineMatchTransport(_engine),
+    MatchKind.passAndPlay => LocalMatchTransport(),
+    MatchKind.online => throw UnsupportedError(
+      'Online mod henüz etkin değil. RemoteMatchTransport bir '
+      'MessageChannel gerçeklemesi ile bağlandığında bu dal açılacak.',
+    ),
+  };
 }

@@ -30,8 +30,10 @@ class S {
 
   // Ana ekran
   String get playVsEngine => _('Bilgisayara Karşı', 'Play vs Computer');
-  String get playVsEngineSub =>
-      _('Sekiz zorluk kademesi, Stockfish motoru', 'Eight levels, Stockfish engine');
+  String get playVsEngineSub => _(
+    'Sekiz zorluk kademesi, Stockfish motoru',
+    'Eight levels, Stockfish engine',
+  );
   String get passAndPlay => _('İki Kişilik', 'Two Players');
   String get passAndPlaySub =>
       _('Aynı cihazda karşılıklı oyun', 'Share one device');
@@ -73,11 +75,11 @@ class S {
   String get drawDeclined => _('Beraberlik reddedildi', 'Draw declined');
   String get claimDraw => _('Beraberlik Talep Et', 'Claim Draw');
   String get promotion => _('Terfi', 'Promotion');
-  String get engineStarting =>
-      _('Motor hazırlanıyor…', 'Starting engine…');
+  String get engineStarting => _('Motor hazırlanıyor…', 'Starting engine…');
   String get engineFailed => _(
-      'Motor başlatılamadı. Uygulamayı yeniden açmayı deneyin.',
-      'The engine could not start. Try reopening the app.');
+    'Motor başlatılamadı. Uygulamayı yeniden açmayı deneyin.',
+    'The engine could not start. Try reopening the app.',
+  );
 
   // Ayarlar
   String get language => _('Dil', 'Language');
@@ -88,8 +90,7 @@ class S {
   String get showCoordinates => _('Koordinatlar', 'Coordinates');
   String get showLegalMoves =>
       _('Geçerli hamleleri göster', 'Show legal moves');
-  String get showEvaluation =>
-      _('Değerlendirme çubuğu', 'Evaluation bar');
+  String get showEvaluation => _('Değerlendirme çubuğu', 'Evaluation bar');
   String get autoQueen => _('Otomatik vezir terfisi', 'Auto-promote to queen');
   String get about => _('Hakkında', 'About');
   String get resetStats => _('İstatistikleri sıfırla', 'Reset statistics');

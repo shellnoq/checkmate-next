@@ -33,8 +33,9 @@ void main() {
     expect(engine.status.value, EngineStatus.ready);
   });
 
-  testWidgets('başlangıç pozisyonunda geçerli bir hamle üretir',
-      (tester) async {
+  testWidgets('başlangıç pozisyonunda geçerli bir hamle üretir', (
+    tester,
+  ) async {
     await engine.applyOptions(DifficultyLevel.club.engineOptions);
     final result = await engine.search(
       fen: kInitialFEN,
@@ -45,9 +46,11 @@ void main() {
     final move = NormalMove.fromUci(result.bestMoveUci!);
     expect(Chess.initial.isLegal(Chess.initial.normalizeMove(move)), isTrue);
     expect(result.principalVariation, isNotNull);
-    debugPrintEngine('kulüp seviyesi ilk hamle: ${result.bestMoveUci} '
-        '(${result.elapsed.inMilliseconds} ms, '
-        'derinlik ${result.principalVariation?.depth})');
+    debugPrintEngine(
+      'kulüp seviyesi ilk hamle: ${result.bestMoveUci} '
+      '(${result.elapsed.inMilliseconds} ms, '
+      'derinlik ${result.principalVariation?.depth})',
+    );
   });
 
   testWidgets('sekiz zorluk kademesinin tamamı hamle üretir', (tester) async {
@@ -57,14 +60,22 @@ void main() {
         fen: kInitialFEN,
         limits: level.searchLimits,
       );
-      expect(result.bestMoveUci, isNotNull,
-          reason: '${level.id} hamle üretmedi');
+      expect(
+        result.bestMoveUci,
+        isNotNull,
+        reason: '${level.id} hamle üretmedi',
+      );
       final move = NormalMove.fromUci(result.bestMoveUci!);
-      expect(Chess.initial.isLegal(Chess.initial.normalizeMove(move)), isTrue,
-          reason: '${level.id} geçersiz hamle üretti: ${result.bestMoveUci}');
-      debugPrintEngine('${level.id.padRight(12)} ${result.bestMoveUci} '
-          '${result.elapsed.inMilliseconds} ms  '
-          'multipv=${result.lines.length}');
+      expect(
+        Chess.initial.isLegal(Chess.initial.normalizeMove(move)),
+        isTrue,
+        reason: '${level.id} geçersiz hamle üretti: ${result.bestMoveUci}',
+      );
+      debugPrintEngine(
+        '${level.id.padRight(12)} ${result.bestMoveUci} '
+        '${result.elapsed.inMilliseconds} ms  '
+        'multipv=${result.lines.length}',
+      );
     }
   });
 
@@ -89,8 +100,11 @@ void main() {
       fen: kInitialFEN,
       limits: DifficultyLevel.beginner.searchLimits,
     );
-    expect(result.lines.length, greaterThan(1),
-        reason: 'acemi kademesinde MultiPV çalışmıyor');
+    expect(
+      result.lines.length,
+      greaterThan(1),
+      reason: 'acemi kademesinde MultiPV çalışmıyor',
+    );
   });
 
   testWidgets('motora karşı tam bir oyun oynanır', (tester) async {
@@ -151,18 +165,26 @@ void main() {
     final expectedPlies = controller.phase == GamePhase.playing
         ? playerMoves * 2
         : playerMoves;
-    expect(controller.moves.length, greaterThanOrEqualTo(expectedPlies),
-        reason: 'motor yeterli sayıda yanıt vermedi');
-    debugPrintEngine('oyun ${controller.moves.length} yarım hamle sürdü, '
-        'sonuç: ${controller.result?.reason.name ?? 'devam ediyor'}');
+    expect(
+      controller.moves.length,
+      greaterThanOrEqualTo(expectedPlies),
+      reason: 'motor yeterli sayıda yanıt vermedi',
+    );
+    debugPrintEngine(
+      'oyun ${controller.moves.length} yarım hamle sürdü, '
+      'sonuç: ${controller.result?.reason.name ?? 'devam ediyor'}',
+    );
 
     // Kaydedilen her hamle baştan yeniden oynatıldığında aynı pozisyona
     // ulaşılmalıdır.
     var replay = Chess.initial as Position;
     for (final record in controller.moves) {
       final move = replay.normalizeMove(NormalMove.fromUci(record.uci));
-      expect(replay.isLegal(move), isTrue,
-          reason: 'kayıtlı hamle geçersiz: ${record.uci} (${record.san})');
+      expect(
+        replay.isLegal(move),
+        isTrue,
+        reason: 'kayıtlı hamle geçersiz: ${record.uci} (${record.san})',
+      );
       replay = replay.play(move);
     }
     expect(replay.fen, controller.position.fen);

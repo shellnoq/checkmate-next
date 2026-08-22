@@ -42,9 +42,11 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
                 final confirmed = await showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: Text(settings.turkish
-                        ? 'Tüm oyunlar silinsin mi?'
-                        : 'Delete all games?'),
+                    title: Text(
+                      settings.turkish
+                          ? 'Tüm oyunlar silinsin mi?'
+                          : 'Delete all games?',
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
@@ -91,7 +93,8 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
               itemBuilder: (context, index) {
                 final game = _games[index];
                 final result = GameResult.fromJson(
-                    game['result']! as Map<String, Object?>);
+                  game['result']! as Map<String, Object?>,
+                );
                 final date = DateTime.tryParse(game['date'] as String? ?? '');
                 final difficultyId = game['difficulty'] as String?;
                 final difficulty = difficultyId == null
@@ -112,23 +115,22 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
                       color: result.isDraw
                           ? theme.colorScheme.surfaceContainerHighest
                           : won
-                              ? const Color(0xFF3F9D6B).withValues(alpha: 0.16)
-                              : const Color(0xFFC0554F)
-                                  .withValues(alpha: 0.16),
+                          ? const Color(0xFF3F9D6B).withValues(alpha: 0.16)
+                          : const Color(0xFFC0554F).withValues(alpha: 0.16),
                     ),
                     child: Text(
                       result.isDraw
                           ? '½'
                           : won
-                              ? '1'
-                              : '0',
+                          ? '1'
+                          : '0',
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: result.isDraw
                             ? theme.colorScheme.onSurfaceVariant
                             : won
-                                ? const Color(0xFF3F9D6B)
-                                : const Color(0xFFC0554F),
+                            ? const Color(0xFF3F9D6B)
+                            : const Color(0xFFC0554F),
                       ),
                     ),
                   ),
@@ -150,7 +152,8 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
                     onPressed: () async {
                       final messenger = ScaffoldMessenger.of(context);
                       await Clipboard.setData(
-                          ClipboardData(text: game['pgn'] as String? ?? ''));
+                        ClipboardData(text: game['pgn'] as String? ?? ''),
+                      );
                       messenger.showSnackBar(
                         SnackBar(content: Text(s.pgnCopied)),
                       );
@@ -158,7 +161,8 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
                   ),
                   onLongPress: () async {
                     await AppStorage.deleteArchivedGame(
-                        game['_key']! as String);
+                      game['_key']! as String,
+                    );
                     setState(() => _games = AppStorage.archivedGames());
                   },
                 );

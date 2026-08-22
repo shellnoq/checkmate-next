@@ -79,8 +79,9 @@ class PromotionSheet extends StatelessWidget {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: onCancel,
-                child: Text(MaterialLocalizations.of(context)
-                    .cancelButtonLabel),
+                child: Text(
+                  MaterialLocalizations.of(context).cancelButtonLabel,
+                ),
               ),
             ],
           ),

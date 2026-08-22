@@ -34,8 +34,11 @@ void main() {
     await _hold(tester, 2000);
 
     // Süresiz oyun seçilir; saat tıklaması pump döngüsünü bozmasın.
-    await tester.scrollUntilVisible(find.text('Süresiz'), 150,
-        scrollable: list);
+    await tester.scrollUntilVisible(
+      find.text('Süresiz'),
+      150,
+      scrollable: list,
+    );
     await _settle(tester, 600);
     await tester.tap(find.text('Süresiz'));
     await _settle(tester, 600);
@@ -47,8 +50,11 @@ void main() {
     await _settle(tester, 1000);
 
     // Motorun açılmasını bekle: tahta görünene kadar.
-    await _waitFor(tester, () => find.byType(ChessBoard).evaluate().isNotEmpty,
-        'tahta görünmedi');
+    await _waitFor(
+      tester,
+      () => find.byType(ChessBoard).evaluate().isNotEmpty,
+      'tahta görünmedi',
+    );
     await _settle(tester, 1500);
     _mark('OYUN_EKRANI');
     await _hold(tester, 3000);
@@ -101,10 +107,9 @@ Future<void> _tapSquare(WidgetTester tester, Square square) async {
   final size = rect.width / 8;
   final col = square.file.toInt();
   final row = 7 - square.rank.toInt();
-  await tester.tapAt(Offset(
-    rect.left + (col + 0.5) * size,
-    rect.top + (row + 0.5) * size,
-  ));
+  await tester.tapAt(
+    Offset(rect.left + (col + 0.5) * size, rect.top + (row + 0.5) * size),
+  );
 }
 
 Future<void> _settle(WidgetTester tester, int ms) async {

@@ -11,10 +11,10 @@ import 'model/time_control.dart';
 /// süre kaymaz.
 class ChessClock {
   ChessClock(this.timeControl)
-      : _remaining = {
-          Side.white: timeControl.initial,
-          Side.black: timeControl.initial,
-        };
+    : _remaining = {
+        Side.white: timeControl.initial,
+        Side.black: timeControl.initial,
+      };
 
   final TimeControl timeControl;
   final Map<Side, Duration> _remaining;

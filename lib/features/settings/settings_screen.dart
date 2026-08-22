@@ -230,8 +230,7 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => showLicensePage(
               context: context,
               applicationName: s.appName,
-              applicationLegalese:
-                  'Stockfish · GNU General Public License v3',
+              applicationLegalese: 'Stockfish · GNU General Public License v3',
             ),
           ),
         ],
@@ -252,10 +251,10 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         text.toUpperCase(),
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-              letterSpacing: 1.1,
-              fontWeight: FontWeight.w600,
-            ),
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          letterSpacing: 1.1,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

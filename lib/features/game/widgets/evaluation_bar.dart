@@ -41,7 +41,8 @@ class EvaluationBar extends StatelessWidget {
     // Lichess'in kullandığı yumuşatmaya yakın bir eğri: ±400 santipiyondan
     // sonra çubuk doygunlaşır.
     final clamped = fromWhite.clamp(-1000, 1000) / 1000;
-    final curved = clamped.sign * (1 - (1 - clamped.abs()) * (1 - clamped.abs()));
+    final curved =
+        clamped.sign * (1 - (1 - clamped.abs()) * (1 - clamped.abs()));
     return (0.5 + curved * 0.5).clamp(0.02, 0.98);
   }
 

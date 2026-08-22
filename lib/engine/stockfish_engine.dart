@@ -19,8 +19,7 @@ class StockfishEngine implements ChessEngine {
   static const _searchTimeout = Duration(seconds: 90);
 
   final Random _random;
-  final ValueNotifier<EngineStatus> _status =
-      ValueNotifier(EngineStatus.idle);
+  final ValueNotifier<EngineStatus> _status = ValueNotifier(EngineStatus.idle);
   final StreamController<EngineLine> _infoController =
       StreamController<EngineLine>.broadcast();
 
@@ -42,7 +41,8 @@ class StockfishEngine implements ChessEngine {
   @override
   Stream<EngineLine> get infoStream => _infoController.stream;
 
-  bool get isReady => _status.value == EngineStatus.ready ||
+  bool get isReady =>
+      _status.value == EngineStatus.ready ||
       _status.value == EngineStatus.searching;
 
   @override
@@ -58,9 +58,12 @@ class StockfishEngine implements ChessEngine {
     try {
       final sf = Stockfish();
       _stockfish = sf;
-      _stdoutSub = sf.stdout.listen(_onLine, onError: (Object e) {
-        _fail(e);
-      });
+      _stdoutSub = sf.stdout.listen(
+        _onLine,
+        onError: (Object e) {
+          _fail(e);
+        },
+      );
 
       // Native motorun ayağa kalkmasını bekle.
       final deadline = DateTime.now().add(_handshakeTimeout);
@@ -120,8 +123,9 @@ class StockfishEngine implements ChessEngine {
       // Önceki arama hâlâ sürüyorsa önce onu bitir. Bu sırada `bestmove`
       // gelip alanı temizleyebileceği için yerel değişken üzerinden beklenir.
       await stopSearch();
-      await pending.future
-          .catchError((_) => const SearchResult(bestMoveUci: null));
+      await pending.future.catchError(
+        (_) => const SearchResult(bestMoveUci: null),
+      );
     }
 
     _pendingLines.clear();
@@ -225,8 +229,10 @@ class StockfishEngine implements ChessEngine {
 
     // Mat kaçırmayı ya da mat yemeyi rastgeleliğe bırakma: acemi de olsa
     // matı görmesi beklenen durumlarda en iyi hamlede kal.
-    final pv1 = lines.firstWhere((l) => l.multiPvIndex == 1,
-        orElse: () => alternatives.first);
+    final pv1 = lines.firstWhere(
+      (l) => l.multiPvIndex == 1,
+      orElse: () => alternatives.first,
+    );
     if (pv1.isMate) return best;
 
     // Sıraya göre azalan ağırlık: ikinci en iyi hamle en olası alternatif.

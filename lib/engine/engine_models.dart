@@ -17,14 +17,16 @@ class SearchLimits {
   final int multiPv;
 
   const SearchLimits({this.depth, this.moveTimeMs, this.multiPv = 1})
-      : assert(depth != null || moveTimeMs != null,
-            'En az bir arama sınırı verilmelidir');
+    : assert(
+        depth != null || moveTimeMs != null,
+        'En az bir arama sınırı verilmelidir',
+      );
 
   Map<String, Object?> toJson() => {
-        'depth': depth,
-        'moveTimeMs': moveTimeMs,
-        'multiPv': multiPv,
-      };
+    'depth': depth,
+    'moveTimeMs': moveTimeMs,
+    'multiPv': multiPv,
+  };
 }
 
 /// Motora uygulanacak UCI seçenekleri.
@@ -138,7 +140,7 @@ class SearchResult {
     this.elapsed = Duration.zero,
   });
 
-  EngineLine? get principalVariation =>
-      lines.isEmpty ? null : lines.firstWhere((l) => l.multiPvIndex == 1,
-          orElse: () => lines.first);
+  EngineLine? get principalVariation => lines.isEmpty
+      ? null
+      : lines.firstWhere((l) => l.multiPvIndex == 1, orElse: () => lines.first);
 }

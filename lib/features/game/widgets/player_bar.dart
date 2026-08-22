@@ -51,8 +51,9 @@ class PlayerBar extends StatelessWidget {
             height: 10,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color:
-                  side == Side.white ? pieceSet.whiteFill : pieceSet.blackFill,
+              color: side == Side.white
+                  ? pieceSet.whiteFill
+                  : pieceSet.blackFill,
               border: Border.all(color: scheme.outlineVariant),
             ),
           ),
@@ -68,8 +69,9 @@ class PlayerBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                    color:
-                        isActive ? scheme.onSurface : scheme.onSurfaceVariant,
+                    color: isActive
+                        ? scheme.onSurface
+                        : scheme.onSurfaceVariant,
                   ),
                 ),
                 if (subtitle != null)
@@ -193,13 +195,13 @@ class _ClockChip extends StatelessWidget {
     final background = lowTime && isActive
         ? const Color(0xFFC0554F)
         : isActive
-            ? scheme.primaryContainer
-            : scheme.surfaceContainerHighest;
+        ? scheme.primaryContainer
+        : scheme.surfaceContainerHighest;
     final foreground = lowTime && isActive
         ? Colors.white
         : isActive
-            ? scheme.onPrimaryContainer
-            : scheme.onSurfaceVariant;
+        ? scheme.onPrimaryContainer
+        : scheme.onSurfaceVariant;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),

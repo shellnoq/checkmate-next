@@ -34,10 +34,14 @@ void main() {
     });
 
     test('bilgi taşımayan satırlar yok sayılır', () {
-      expect(UciParser.parseInfo('info string NNUE evaluation using net'),
-          isNull);
-      expect(UciParser.parseInfo('info depth 1 currmove e2e4 currmovenumber 1'),
-          isNull);
+      expect(
+        UciParser.parseInfo('info string NNUE evaluation using net'),
+        isNull,
+      );
+      expect(
+        UciParser.parseInfo('info depth 1 currmove e2e4 currmovenumber 1'),
+        isNull,
+      );
       expect(UciParser.parseInfo('readyok'), isNull);
       expect(UciParser.parseInfo('bestmove e2e4'), isNull);
     });
@@ -51,8 +55,10 @@ void main() {
 
   group('UciParser.parseBestMove', () {
     test('hamle ve ponder çözülür', () {
-      expect(UciParser.parseBestMove('bestmove e2e4 ponder e7e5'),
-          ('e2e4', 'e7e5'));
+      expect(UciParser.parseBestMove('bestmove e2e4 ponder e7e5'), (
+        'e2e4',
+        'e7e5',
+      ));
     });
 
     test('ponder yoksa null döner', () {

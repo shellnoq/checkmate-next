@@ -63,32 +63,35 @@ class MatchConfig {
   });
 
   Map<String, Object?> toJson() => {
-        'matchId': matchId,
-        'kind': kind.name,
-        'localSide': localSide.name,
-        'difficulty': difficulty?.id,
-        'timeControl': {
-          'id': timeControl.id,
-          'initialMs': timeControl.initial.inMilliseconds,
-          'incrementMs': timeControl.increment.inMilliseconds,
-        },
-        'startingFen': startingFen,
-        'opponentName': opponentName,
-      };
+    'matchId': matchId,
+    'kind': kind.name,
+    'localSide': localSide.name,
+    'difficulty': difficulty?.id,
+    'timeControl': {
+      'id': timeControl.id,
+      'initialMs': timeControl.initial.inMilliseconds,
+      'incrementMs': timeControl.increment.inMilliseconds,
+    },
+    'startingFen': startingFen,
+    'opponentName': opponentName,
+  };
 
   static MatchConfig fromJson(Map<String, Object?> json) => MatchConfig(
-        matchId: json['matchId']! as String,
-        kind: MatchKind.values
-            .firstWhere((k) => k.name == json['kind'], orElse: () => MatchKind.engine),
-        localSide: json['localSide'] == 'black' ? Side.black : Side.white,
-        difficulty: json['difficulty'] == null
-            ? null
-            : DifficultyLevel.fromId(json['difficulty'] as String),
-        timeControl: TimeControl.fromId(
-            (json['timeControl'] as Map?)?['id'] as String?),
-        startingFen: (json['startingFen'] as String?) ?? kInitialFEN,
-        opponentName: json['opponentName'] as String?,
-      );
+    matchId: json['matchId']! as String,
+    kind: MatchKind.values.firstWhere(
+      (k) => k.name == json['kind'],
+      orElse: () => MatchKind.engine,
+    ),
+    localSide: json['localSide'] == 'black' ? Side.black : Side.white,
+    difficulty: json['difficulty'] == null
+        ? null
+        : DifficultyLevel.fromId(json['difficulty'] as String),
+    timeControl: TimeControl.fromId(
+      (json['timeControl'] as Map?)?['id'] as String?,
+    ),
+    startingFen: (json['startingFen'] as String?) ?? kInitialFEN,
+    opponentName: json['opponentName'] as String?,
+  );
 }
 
 // ── Uygulamadan taşıma katmanına giden komutlar ──
@@ -102,9 +105,9 @@ sealed class MatchCommand {
   static MatchCommand fromJson(Map<String, Object?> json) {
     return switch (json['type']) {
       'move' => SubmitMove(
-          uci: json['uci']! as String,
-          remainingMs: json['remainingMs'] as int?,
-        ),
+        uci: json['uci']! as String,
+        remainingMs: json['remainingMs'] as int?,
+      ),
       'resign' => const ResignMatch(),
       'offerDraw' => const OfferDraw(),
       'respondDraw' => RespondToDrawOffer(accept: json['accept']! as bool),
@@ -124,8 +127,11 @@ class SubmitMove extends MatchCommand {
   const SubmitMove({required this.uci, this.remainingMs});
 
   @override
-  Map<String, Object?> toJson() =>
-      {'type': 'move', 'uci': uci, 'remainingMs': remainingMs};
+  Map<String, Object?> toJson() => {
+    'type': 'move',
+    'uci': uci,
+    'remainingMs': remainingMs,
+  };
 }
 
 class ResignMatch extends MatchCommand {
@@ -170,25 +176,28 @@ sealed class MatchEvent {
   static MatchEvent fromJson(Map<String, Object?> json) {
     return switch (json['type']) {
       'opened' => MatchOpened(
-          MatchConfig.fromJson(json['config']! as Map<String, Object?>)),
+        MatchConfig.fromJson(json['config']! as Map<String, Object?>),
+      ),
       'move' => RemoteMove(
-          uci: json['uci']! as String,
-          remainingMs: json['remainingMs'] as int?,
-        ),
+        uci: json['uci']! as String,
+        remainingMs: json['remainingMs'] as int?,
+      ),
       'thinking' => RemoteThinking(json['value']! as bool),
       'drawOffer' => const RemoteDrawOffer(),
       'takebackAccepted' => RemoteTakebackAccepted(json['plies']! as int),
       'ended' => MatchEnded(
-          reason: GameEndReason.values
-              .firstWhere((r) => r.name == json['reason']),
-          winner: switch (json['winner']) {
-            'white' => Side.white,
-            'black' => Side.black,
-            _ => null,
-          },
+        reason: GameEndReason.values.firstWhere(
+          (r) => r.name == json['reason'],
         ),
-      'connection' => MatchConnectionChanged(MatchConnectionState.values
-          .firstWhere((s) => s.name == json['state'])),
+        winner: switch (json['winner']) {
+          'white' => Side.white,
+          'black' => Side.black,
+          _ => null,
+        },
+      ),
+      'connection' => MatchConnectionChanged(
+        MatchConnectionState.values.firstWhere((s) => s.name == json['state']),
+      ),
       _ => throw FormatException('Bilinmeyen olay: ${json['type']}'),
     };
   }
@@ -198,8 +207,10 @@ class MatchOpened extends MatchEvent {
   final MatchConfig config;
   const MatchOpened(this.config);
   @override
-  Map<String, Object?> toJson() =>
-      {'type': 'opened', 'config': config.toJson()};
+  Map<String, Object?> toJson() => {
+    'type': 'opened',
+    'config': config.toJson(),
+  };
 }
 
 /// Rakibin oynadığı hamle.
@@ -208,8 +219,11 @@ class RemoteMove extends MatchEvent {
   final int? remainingMs;
   const RemoteMove({required this.uci, this.remainingMs});
   @override
-  Map<String, Object?> toJson() =>
-      {'type': 'move', 'uci': uci, 'remainingMs': remainingMs};
+  Map<String, Object?> toJson() => {
+    'type': 'move',
+    'uci': uci,
+    'remainingMs': remainingMs,
+  };
 }
 
 /// Rakip düşünüyor (motor arıyor / online rakip bağlı ve sırası).
@@ -231,8 +245,7 @@ class RemoteTakebackAccepted extends MatchEvent {
   final int plies;
   const RemoteTakebackAccepted(this.plies);
   @override
-  Map<String, Object?> toJson() =>
-      {'type': 'takebackAccepted', 'plies': plies};
+  Map<String, Object?> toJson() => {'type': 'takebackAccepted', 'plies': plies};
 }
 
 class MatchEnded extends MatchEvent {
@@ -242,16 +255,18 @@ class MatchEnded extends MatchEvent {
   final Side? winner;
   const MatchEnded({required this.reason, this.winner});
   @override
-  Map<String, Object?> toJson() =>
-      {'type': 'ended', 'reason': reason.name, 'winner': winner?.name};
+  Map<String, Object?> toJson() => {
+    'type': 'ended',
+    'reason': reason.name,
+    'winner': winner?.name,
+  };
 }
 
 class MatchConnectionChanged extends MatchEvent {
   final MatchConnectionState state;
   const MatchConnectionChanged(this.state);
   @override
-  Map<String, Object?> toJson() =>
-      {'type': 'connection', 'state': state.name};
+  Map<String, Object?> toJson() => {'type': 'connection', 'state': state.name};
 }
 
 /// Taşıma katmanında kurtarılamayan hata.
@@ -259,6 +274,8 @@ class MatchFailure extends MatchEvent {
   final Object error;
   const MatchFailure(this.error);
   @override
-  Map<String, Object?> toJson() =>
-      {'type': 'failure', 'error': error.toString()};
+  Map<String, Object?> toJson() => {
+    'type': 'failure',
+    'error': error.toString(),
+  };
 }

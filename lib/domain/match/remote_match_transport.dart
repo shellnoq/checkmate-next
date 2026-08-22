@@ -68,10 +68,13 @@ class RemoteMatchTransport implements MatchTransport {
   @override
   Future<void> open(MatchConfig config) async {
     _setConnection(MatchConnectionState.connecting);
-    _sub = _channel.incoming.listen(_onPayload, onError: (Object e) {
-      _emit(MatchFailure(e));
-      _setConnection(MatchConnectionState.reconnecting);
-    });
+    _sub = _channel.incoming.listen(
+      _onPayload,
+      onError: (Object e) {
+        _emit(MatchFailure(e));
+        _setConnection(MatchConnectionState.reconnecting);
+      },
+    );
     await _channel.connect(endpoint, config.matchId);
     _setConnection(MatchConnectionState.connected);
     _emit(MatchOpened(config));

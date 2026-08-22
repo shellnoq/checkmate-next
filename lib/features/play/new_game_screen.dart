@@ -47,8 +47,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
     final side = switch (_colour) {
       _ColourChoice.white => Side.white,
       _ColourChoice.black => Side.black,
-      _ColourChoice.random =>
-        Random().nextBool() ? Side.white : Side.black,
+      _ColourChoice.random => Random().nextBool() ? Side.white : Side.black,
     };
 
     final config = MatchConfig(
@@ -72,9 +71,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_vsEngine ? s.playVsEngine : s.passAndPlay),
-      ),
+      appBar: AppBar(title: Text(_vsEngine ? s.playVsEngine : s.passAndPlay)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
         children: [
@@ -132,7 +129,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
                     control.isUnlimited
                         ? control.label(settings.turkish)
                         : '${control.label(settings.turkish)} '
-                            '${control.shortLabel}',
+                              '${control.shortLabel}',
                   ),
                   selected: control.id == _timeControl.id,
                   onSelected: (_) => setState(() => _timeControl = control),
@@ -145,16 +142,19 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline,
-                      size: 20, color: theme.colorScheme.onSurfaceVariant),
+                  Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       settings.turkish
                           ? 'Motor cihazınızda çalışır; internet bağlantısı '
-                              'gerekmez.'
+                                'gerekmez.'
                           : 'The engine runs on your device; no internet '
-                              'connection required.',
+                                'connection required.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -192,10 +192,10 @@ class _SectionTitle extends StatelessWidget {
       child: Text(
         text.toUpperCase(),
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-              letterSpacing: 1.1,
-              fontWeight: FontWeight.w600,
-            ),
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          letterSpacing: 1.1,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

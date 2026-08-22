@@ -34,36 +34,36 @@ class MoveRecord {
   });
 
   MoveRecord copyWith({int? evaluationCp}) => MoveRecord(
-        uci: uci,
-        san: san,
-        fenAfter: fenAfter,
-        side: side,
-        clockAfter: clockAfter,
-        timeSpent: timeSpent,
-        evaluationCp: evaluationCp ?? this.evaluationCp,
-      );
+    uci: uci,
+    san: san,
+    fenAfter: fenAfter,
+    side: side,
+    clockAfter: clockAfter,
+    timeSpent: timeSpent,
+    evaluationCp: evaluationCp ?? this.evaluationCp,
+  );
 
   Map<String, Object?> toJson() => {
-        'uci': uci,
-        'san': san,
-        'fenAfter': fenAfter,
-        'side': side.name,
-        'clockAfterMs': clockAfter?.inMilliseconds,
-        'timeSpentMs': timeSpent?.inMilliseconds,
-        'evaluationCp': evaluationCp,
-      };
+    'uci': uci,
+    'san': san,
+    'fenAfter': fenAfter,
+    'side': side.name,
+    'clockAfterMs': clockAfter?.inMilliseconds,
+    'timeSpentMs': timeSpent?.inMilliseconds,
+    'evaluationCp': evaluationCp,
+  };
 
   static MoveRecord fromJson(Map<String, Object?> json) => MoveRecord(
-        uci: json['uci']! as String,
-        san: json['san']! as String,
-        fenAfter: json['fenAfter']! as String,
-        side: json['side'] == 'black' ? Side.black : Side.white,
-        clockAfter: json['clockAfterMs'] == null
-            ? null
-            : Duration(milliseconds: json['clockAfterMs']! as int),
-        timeSpent: json['timeSpentMs'] == null
-            ? null
-            : Duration(milliseconds: json['timeSpentMs']! as int),
-        evaluationCp: json['evaluationCp'] as int?,
-      );
+    uci: json['uci']! as String,
+    san: json['san']! as String,
+    fenAfter: json['fenAfter']! as String,
+    side: json['side'] == 'black' ? Side.black : Side.white,
+    clockAfter: json['clockAfterMs'] == null
+        ? null
+        : Duration(milliseconds: json['clockAfterMs']! as int),
+    timeSpent: json['timeSpentMs'] == null
+        ? null
+        : Duration(milliseconds: json['timeSpentMs']! as int),
+    evaluationCp: json['evaluationCp'] as int?,
+  );
 }

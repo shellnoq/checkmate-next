@@ -23,9 +23,8 @@ class TimeControl {
   String label(bool turkish) => turkish ? trName : enName;
 
   /// `5+3` biçiminde kısa gösterim.
-  String get shortLabel => isUnlimited
-      ? '∞'
-      : '${initial.inMinutes}+${increment.inSeconds}';
+  String get shortLabel =>
+      isUnlimited ? '∞' : '${initial.inMinutes}+${increment.inSeconds}';
 
   static const unlimited = TimeControl(
     id: 'unlimited',

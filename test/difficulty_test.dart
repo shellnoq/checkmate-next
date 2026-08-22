@@ -29,8 +29,10 @@ void main() {
     });
 
     test('alt kademeler MultiPV ile hata payı kullanır', () {
-      expect(DifficultyLevel.beginner.engineOptions.blunderChance,
-          greaterThan(0));
+      expect(
+        DifficultyLevel.beginner.engineOptions.blunderChance,
+        greaterThan(0),
+      );
       expect(DifficultyLevel.beginner.searchLimits.multiPv, greaterThan(1));
       expect(DifficultyLevel.grandmaster.engineOptions.blunderChance, 0);
       expect(DifficultyLevel.grandmaster.engineOptions.limitElo, isNull);

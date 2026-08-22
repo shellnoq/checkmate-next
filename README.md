@@ -52,11 +52,11 @@ Tasarımın iki taşıyıcı fikri var:
    mu, aynı cihazdaki ikinci oyuncu mu, yoksa uzaktaki bir insan mı olduğunu
    bilmez.
 
-## Lisans uyarısı
+## Lisans
 
-Uygulama Stockfish'i içerir ve Stockfish **GPLv3** ile lisanslıdır. Dağıtım
-yükümlülükleri için `docs/LICENSING.md` dosyasını okuyun — bu, yayın öncesi
-karara bağlanması gereken bir konudur.
+Uygulama Stockfish satranç motorunu içerir; Stockfish GPLv3 ile lisanslıdır ve
+bu lisans tüm dağıtımı kapsar. Proje bu nedenle **GPLv3** altında dağıtılır ve
+kaynak kodu herkese açıktır. Ayrıntılar: `docs/LICENSING.md`.
 
 ## Belgeler
 

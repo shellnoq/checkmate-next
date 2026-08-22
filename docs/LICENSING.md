@@ -1,13 +1,18 @@
 # Lisans yükümlülükleri
 
-## Stockfish — GPLv3 (karara bağlanması gereken konu)
+> **Karar (23 Ağustos 2026):** Stockfish korunur, uygulamanın kaynak kodu
+> herkese açık yayınlanır. Aşağıdaki yükümlülükler bu karar doğrultusunda
+> yerine getirilecektir.
+
+## Stockfish — GPLv3
 
 Uygulama Stockfish satranç motorunu `stockfish` Flutter eklentisi üzerinden
 içerir. Stockfish **GNU General Public License v3** ile lisanslıdır ve bu
 lisans "bulaşıcıdır": GPLv3 kodla aynı çalıştırılabilir içinde dağıtılan tüm
 uygulama, GPLv3 koşullarına tabi olur.
 
-Pratikte Google Play'de yayınlamak için şunlar gerekir:
+Bu nedenle proje GPLv3 altında dağıtılır. Google Play'de yayınlamak için
+şunlar gerekir:
 
 1. **Uygulamanın kaynak kodu, dağıtımı alan herkese açık olmalıdır.** Yaygın
    uygulama, mağaza listelemesinde herkese açık bir depo bağlantısı vermektir.
@@ -19,7 +24,16 @@ Pratikte Google Play'de yayınlamak için şunlar gerekir:
 4. Google Play Geliştirici Dağıtım Sözleşmesi ile GPLv3 arasında uygulamada
    çatışma çıkmaz; GPL'li birçok uygulama mağazada yayındadır.
 
-### Kapalı kaynak kalmak isteniyorsa
+### Yayın öncesi yapılacaklar
+
+- [ ] Depo herkese açık hâle getirilir (`shellnoq` hesabı altında)
+- [ ] Mağaza listelemesinin "Geliştirici web sitesi" alanına depo bağlantısı
+      konur
+- [ ] GPLv3 tam metni depo kökündeki `LICENSE` dosyasına eklenir
+- [ ] Uygulama içi "Lisanslar" ekranı (Ayarlar → Lisanslar) kontrol edilir;
+      Stockfish ve tüm bağımlılıklar orada listelenir
+
+### İleride kapalı kaynağa dönülmek istenirse
 
 Stockfish yerine lisansı izin verici bir motor kullanılmalıdır. Uygulamanın
 motor katmanı `ChessEngine` arayüzü ile soyutlandığı için bu değişiklik

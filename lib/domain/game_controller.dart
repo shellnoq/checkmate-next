@@ -262,13 +262,37 @@ class GameController extends ChangeNotifier {
     final remaining = config.timeControl.isUnlimited
         ? null
         : clock.remainingOf(_position.turn);
+    final wireUci = _toStandardUci(uiMove);
     final applied = _applyMove(uiMove);
     if (!applied) return;
 
     _transport.send(SubmitMove(
-      uci: uiMove.uci,
+      uci: wireUci,
       remainingMs: remaining?.inMilliseconds,
     ));
+  }
+
+  /// Rok hamlesini standart UCI biçimine çevirir.
+  ///
+  /// `dartchess` rok için hem şah-iki-kare (`e1g1`) hem şah-kaleye (`e1h1`)
+  /// gösterimini geçerli sayar. UCI protokolü ve online kablo biçimi ise
+  /// (Chess960 dışında) yalnızca birincisini tanır; kullanıcı kaleye dokunarak
+  /// rok yaptığında hamlenin motora yanlış gitmemesi için burada dönüştürülür.
+  String _toStandardUci(NormalMove move) {
+    final piece = _position.board.pieceAt(move.from);
+    if (piece == null || piece.role != Role.king) return move.uci;
+    final target = _position.board.pieceAt(move.to);
+    if (target == null ||
+        target.role != Role.rook ||
+        target.color != piece.color) {
+      return move.uci;
+    }
+    final kingSide = move.to.file > move.from.file;
+    final destination = Square.fromCoords(
+      File(kingSide ? 6 : 2),
+      move.from.rank,
+    );
+    return NormalMove(from: move.from, to: destination).uci;
   }
 
   /// Hamleyi kural katmanına uygular, kaydeder ve oyun sonu kontrolü yapar.
@@ -281,6 +305,7 @@ class GameController extends ChangeNotifier {
     }
 
     final mover = _position.turn;
+    final wireUci = _toStandardUci(uiMove);
     final (newPosition, san) = _position.makeSan(normalized);
     _position = newPosition;
 
@@ -289,7 +314,7 @@ class GameController extends ChangeNotifier {
     }
 
     _moves.add(MoveRecord(
-      uci: uiMove.uci,
+      uci: wireUci,
       san: san,
       fenAfter: _position.fen,
       side: mover,

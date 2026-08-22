@@ -6,6 +6,7 @@ import 'package:stockfish/stockfish.dart';
 
 import 'chess_engine.dart';
 import 'engine_models.dart';
+import 'uci_parser.dart';
 
 /// [ChessEngine]'in Stockfish (UCI, FFI) gerçeklemesi.
 ///
@@ -114,12 +115,13 @@ class StockfishEngine implements ChessEngine {
     await start();
     final sf = _stockfish!;
 
-    if (_searchCompleter != null && !_searchCompleter!.isCompleted) {
-      // Önceki arama hâlâ sürüyorsa önce onu bitir.
+    final pending = _searchCompleter;
+    if (pending != null && !pending.isCompleted) {
+      // Önceki arama hâlâ sürüyorsa önce onu bitir. Bu sırada `bestmove`
+      // gelip alanı temizleyebileceği için yerel değişken üzerinden beklenir.
       await stopSearch();
-      await _searchCompleter!.future.catchError((_) => const SearchResult(
-            bestMoveUci: null,
-          ));
+      await pending.future
+          .catchError((_) => const SearchResult(bestMoveUci: null));
     }
 
     _pendingLines.clear();
@@ -170,7 +172,7 @@ class StockfishEngine implements ChessEngine {
       return;
     }
     if (line.startsWith('info ')) {
-      final parsed = _parseInfo(line);
+      final parsed = UciParser.parseInfo(line);
       if (parsed != null) {
         _pendingLines[parsed.multiPvIndex] = parsed;
         if (!_infoController.isClosed) _infoController.add(parsed);
@@ -186,57 +188,8 @@ class StockfishEngine implements ChessEngine {
     if (c != null && !c.isCompleted) c.complete();
   }
 
-  /// `info depth 12 multipv 1 score cp 34 ... pv e2e4 e7e5` satırını ayrıştırır.
-  EngineLine? _parseInfo(String line) {
-    final tokens = line.split(RegExp(r'\s+'));
-    if (tokens.contains('string')) return null;
-
-    int depth = 0;
-    int multiPv = 1;
-    int? cp;
-    int? mate;
-    List<String> pv = const [];
-
-    for (int i = 1; i < tokens.length; i++) {
-      switch (tokens[i]) {
-        case 'depth':
-          depth = int.tryParse(_at(tokens, i + 1) ?? '') ?? depth;
-        case 'multipv':
-          multiPv = int.tryParse(_at(tokens, i + 1) ?? '') ?? multiPv;
-        case 'score':
-          final kind = _at(tokens, i + 1);
-          final value = int.tryParse(_at(tokens, i + 2) ?? '');
-          if (kind == 'cp') {
-            cp = value;
-          } else if (kind == 'mate') {
-            mate = value;
-          }
-        case 'pv':
-          pv = tokens.sublist(min(i + 1, tokens.length));
-          i = tokens.length;
-      }
-    }
-
-    if (pv.isEmpty && cp == null && mate == null) return null;
-    return EngineLine(
-      multiPvIndex: multiPv,
-      depth: depth,
-      centipawns: cp,
-      mateIn: mate,
-      pv: pv,
-    );
-  }
-
-  static String? _at(List<String> list, int index) =>
-      index >= 0 && index < list.length ? list[index] : null;
-
   void _onBestMove(String line) {
-    final tokens = line.split(RegExp(r'\s+'));
-    String? best = _at(tokens, 1);
-    if (best == '(none)' || best == null || best.isEmpty) best = null;
-    String? ponder;
-    final ponderIndex = tokens.indexOf('ponder');
-    if (ponderIndex != -1) ponder = _at(tokens, ponderIndex + 1);
+    final (best, ponder) = UciParser.parseBestMove(line);
 
     final lines = _pendingLines.values.toList()
       ..sort((a, b) => a.multiPvIndex.compareTo(b.multiPvIndex));

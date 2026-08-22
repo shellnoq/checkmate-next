@@ -100,6 +100,81 @@ void main() {
       controller.dispose();
     });
 
+    test('kaleye dokunarak rok yapılırsa kabloya standart UCI gider', () async {
+      final transport = FakeTransport();
+      final controller = build(
+        transport: transport,
+        fen: 'r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1',
+      );
+      await controller.start();
+
+      // dartchess kaleyi de geçerli hedef sayar (e1h1); UCI protokolü ise
+      // yalnızca e1g1 biçimini tanır.
+      controller.selectSquare(Square.e1);
+      expect(controller.destinationsForSelected, contains(Square.h1));
+      controller.selectSquare(Square.h1);
+
+      expect(controller.moves.single.san, 'O-O');
+      expect(controller.moves.single.uci, 'e1g1');
+      expect(transport.sent.whereType<SubmitMove>().single.uci, 'e1g1');
+      controller.dispose();
+    });
+
+    test('uzun rok kabloya e1c1 olarak gider', () async {
+      final transport = FakeTransport();
+      final controller = build(
+        transport: transport,
+        fen: 'r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1',
+      );
+      await controller.start();
+
+      controller.selectSquare(Square.e1);
+      controller.selectSquare(Square.a1);
+
+      expect(controller.moves.single.san, 'O-O-O');
+      expect(controller.moves.single.uci, 'e1c1');
+      expect(controller.position.board.pieceAt(Square.c1)?.role, Role.king);
+      controller.dispose();
+    });
+
+    test('motorun gönderdiği rok hamlesi uygulanır', () async {
+      final transport = FakeTransport();
+      final controller = build(
+        transport: transport,
+        kind: MatchKind.engine,
+        localSide: Side.white,
+        fen: 'r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1',
+      );
+      await controller.start();
+
+      controller.selectSquare(Square.e1);
+      controller.selectSquare(Square.g1);
+      transport.reply('e8g8');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(controller.moves.last.san, 'O-O');
+      expect(controller.position.board.pieceAt(Square.g8)?.role, Role.king);
+      expect(controller.position.board.pieceAt(Square.f8)?.role, Role.rook);
+      controller.dispose();
+    });
+
+    test('geçerken alma uygulanır', () async {
+      final transport = FakeTransport();
+      final controller = build(
+        transport: transport,
+        fen: 'rnbqkbnr/pp1ppppp/8/1Pp5/8/8/P1PPPPPP/RNBQKBNR w KQkq c6 0 3',
+      );
+      await controller.start();
+
+      controller.selectSquare(Square.b5);
+      expect(controller.destinationsForSelected, contains(Square.c6));
+      controller.selectSquare(Square.c6);
+
+      expect(controller.moves.single.san, 'bxc6');
+      expect(controller.position.board.pieceAt(Square.c5), isNull);
+      controller.dispose();
+    });
+
     test('piyon terfisi seçim ister ve seçilen taşa dönüşür', () async {
       final transport = FakeTransport();
       final controller = build(

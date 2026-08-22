@@ -15,7 +15,7 @@ import '../../domain/model/game_result.dart';
 import '../../domain/model/move_record.dart';
 import '../board/chess_board.dart';
 import 'widgets/evaluation_bar.dart';
-import 'widgets/move_list.dart';
+import 'widgets/move_table.dart';
 import 'widgets/player_bar.dart';
 import 'widgets/promotion_sheet.dart';
 
@@ -51,16 +51,18 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       if (widget.config.kind == MatchKind.engine) {
         await ref.read(chessEngineProvider).start();
       }
-      final transport =
-          ref.read(matchTransportFactoryProvider).create(widget.config.kind);
-      final controller = GameController(
-        config: widget.config,
-        transport: transport,
-        analysisEngine: ref.read(chessEngineProvider),
-        analysisEnabled: settings.showEvaluation,
-      )
-        ..onMoveApplied = _onMoveApplied
-        ..onGameEnded = _onGameEnded;
+      final transport = ref
+          .read(matchTransportFactoryProvider)
+          .create(widget.config.kind);
+      final controller =
+          GameController(
+              config: widget.config,
+              transport: transport,
+              analysisEngine: ref.read(chessEngineProvider),
+              analysisEnabled: settings.showEvaluation,
+            )
+            ..onMoveApplied = _onMoveApplied
+            ..onGameEnded = _onGameEnded;
 
       if (!mounted) return;
       setState(() {
@@ -104,7 +106,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   void _onGameEnded(GameResult result) {
     _persistResult(result);
-    final localWon = result.winner != null &&
+    final localWon =
+        result.winner != null &&
         widget.config.kind == MatchKind.engine &&
         result.winner == widget.config.localSide;
     SoundService.instance.play(localWon ? Sfx.victory : Sfx.gameEnd);
@@ -204,8 +207,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           await Clipboard.setData(ClipboardData(text: controller.toPgn()));
           if (!context.mounted) return;
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(s.pgnCopied)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(s.pgnCopied)));
         },
       ),
     );
@@ -329,7 +333,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     }
                   case 'pgn':
                     await Clipboard.setData(
-                        ClipboardData(text: controller.toPgn()));
+                      ClipboardData(text: controller.toPgn()),
+                    );
                     messenger.showSnackBar(
                       SnackBar(content: Text(s.pgnCopied)),
                     );
@@ -346,93 +351,128 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              PlayerBar(
-                name: _nameOf(topSide, s),
-                side: topSide,
-                captured: controller.capturedBy(topSide),
-                materialAdvantage: _advantageOf(topSide, controller),
-                pieceSet: settings.pieceSet,
-                isActive: controller.position.turn == topSide &&
-                    controller.phase == GamePhase.playing,
-                remaining: widget.config.timeControl.isUnlimited
-                    ? null
-                    : controller.clock.remainingOf(topSide),
-                subtitle: controller.opponentThinking &&
-                        controller.position.turn == topSide
-                    ? s.thinking
-                    : null,
-              ),
+              // Oyuncu çubukları tahtaya bitişik durur; üçü birlikte kalan
+              // alanda ortalanır. Aksi hâlde çubuklar ekranın uçlarına
+              // yapışır ve tahtanın çevresinde geniş boşluk kalır.
               Expanded(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final evalWidth =
-                            settings.showEvaluation ? 18.0 : 0.0;
-                        final boardSize = (constraints.maxWidth - evalWidth)
-                            .clamp(0.0, constraints.maxHeight);
-                        return Row(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    const barHeight = 62.0;
+                    final evalWidth = settings.showEvaluation ? 22.0 : 0.0;
+                    // Tahta grubu ekranın en çok %72'sini alır; kalan alan
+                    // notasyon paneline bırakılır. Kısa ekranlarda tahta
+                    // küçülür, panel de kendiliğinden daralır.
+                    final groupHeight = constraints.maxHeight * 0.72;
+                    final available = groupHeight - barHeight * 2;
+                    final boardSize = (constraints.maxWidth - evalWidth - 16)
+                        .clamp(
+                          0.0,
+                          available > 0 ? available : constraints.maxHeight,
+                        );
+
+                    return Column(
+                      children: [
+                        Column(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            if (settings.showEvaluation) ...[
-                              SizedBox(
-                                height: boardSize,
-                                child: EvaluationBar(
-                                  line: controller.evaluation,
-                                  sideToMove: controller.position.turn,
-                                  orientation: orientation,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                            ],
                             SizedBox(
-                              width: boardSize,
-                              height: boardSize,
-                              child: ChessBoard(
-                                position: displayed,
-                                orientation: orientation,
-                                boardTheme: settings.boardTheme,
+                              height: barHeight,
+                              width: boardSize + evalWidth + 16,
+                              child: PlayerBar(
+                                name: _nameOf(topSide, s),
+                                side: topSide,
+                                captured: controller.capturedBy(topSide),
+                                materialAdvantage: _advantageOf(
+                                  topSide,
+                                  controller,
+                                ),
                                 pieceSet: settings.pieceSet,
-                                legalDestinations:
-                                    controller.destinationsForSelected,
-                                selectedSquare: controller.selectedSquare,
-                                lastMove: controller.lastMoveSquares,
-                                checkedSquare: controller.checkedKingSquare,
-                                hintMove: _hintSquares(controller),
-                                interactive:
+                                isActive:
+                                    controller.position.turn == topSide &&
                                     controller.phase == GamePhase.playing,
-                                showCoordinates: settings.showCoordinates,
-                                showLegalMoves: settings.showLegalMoves,
-                                onSquareTap: controller.selectSquare,
-                                onMove: controller.moveByDrag,
+                                remaining: widget.config.timeControl.isUnlimited
+                                    ? null
+                                    : controller.clock.remainingOf(topSide),
+                                subtitle:
+                                    controller.opponentThinking &&
+                                        controller.position.turn == topSide
+                                    ? s.thinking
+                                    : null,
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (settings.showEvaluation) ...[
+                                  SizedBox(
+                                    height: boardSize,
+                                    child: EvaluationBar(
+                                      line: controller.evaluation,
+                                      sideToMove: controller.position.turn,
+                                      orientation: orientation,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                ],
+                                SizedBox(
+                                  width: boardSize,
+                                  height: boardSize,
+                                  child: ChessBoard(
+                                    position: displayed,
+                                    orientation: orientation,
+                                    boardTheme: settings.boardTheme,
+                                    pieceSet: settings.pieceSet,
+                                    legalDestinations:
+                                        controller.destinationsForSelected,
+                                    selectedSquare: controller.selectedSquare,
+                                    lastMove: controller.lastMoveSquares,
+                                    checkedSquare: controller.checkedKingSquare,
+                                    hintMove: _hintSquares(controller),
+                                    interactive:
+                                        controller.phase == GamePhase.playing,
+                                    showCoordinates: settings.showCoordinates,
+                                    showLegalMoves: settings.showLegalMoves,
+                                    onSquareTap: controller.selectSquare,
+                                    onMove: controller.moveByDrag,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: barHeight,
+                              width: boardSize + evalWidth + 16,
+                              child: PlayerBar(
+                                name: _nameOf(bottomSide, s),
+                                side: bottomSide,
+                                captured: controller.capturedBy(bottomSide),
+                                materialAdvantage: _advantageOf(
+                                  bottomSide,
+                                  controller,
+                                ),
+                                pieceSet: settings.pieceSet,
+                                isActive:
+                                    controller.position.turn == bottomSide &&
+                                    controller.phase == GamePhase.playing,
+                                remaining: widget.config.timeControl.isUnlimited
+                                    ? null
+                                    : controller.clock.remainingOf(bottomSide),
                               ),
                             ),
                           ],
-                        );
-                      },
-                    ),
-                  ),
+                        ),
+                        const Divider(height: 17, indent: 16, endIndent: 16),
+                        Expanded(
+                          child: MoveTable(
+                            moves: controller.moves,
+                            currentIndex: controller.browseIndex,
+                            onSelect: controller.browseTo,
+                            emptyHint: s.moves,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              ),
-              PlayerBar(
-                name: _nameOf(bottomSide, s),
-                side: bottomSide,
-                captured: controller.capturedBy(bottomSide),
-                materialAdvantage: _advantageOf(bottomSide, controller),
-                pieceSet: settings.pieceSet,
-                isActive: controller.position.turn == bottomSide &&
-                    controller.phase == GamePhase.playing,
-                remaining: widget.config.timeControl.isUnlimited
-                    ? null
-                    : controller.clock.remainingOf(bottomSide),
-              ),
-              const Divider(height: 1),
-              MoveList(
-                moves: controller.moves,
-                currentIndex: controller.browseIndex,
-                onSelect: controller.browseTo,
               ),
               const Divider(height: 1),
               _ActionBar(controller: controller, strings: s),
@@ -495,14 +535,16 @@ class _ActionBar extends StatelessWidget {
             _ActionButton(
               icon: Icons.first_page,
               label: '',
-              onPressed:
-                  controller.moves.isEmpty ? null : controller.browseStart,
+              onPressed: controller.moves.isEmpty
+                  ? null
+                  : controller.browseStart,
             ),
             _ActionButton(
               icon: Icons.chevron_left,
               label: '',
-              onPressed:
-                  controller.browseIndex > 0 ? controller.browsePrevious : null,
+              onPressed: controller.browseIndex > 0
+                  ? controller.browsePrevious
+                  : null,
             ),
             _ActionButton(
               icon: Icons.chevron_right,
@@ -538,8 +580,7 @@ class _ActionBar extends StatelessWidget {
                           title: Text(strings.confirmResign),
                           actions: [
                             TextButton(
-                              onPressed: () =>
-                                  Navigator.of(context).pop(false),
+                              onPressed: () => Navigator.of(context).pop(false),
                               child: Text(strings.cancel),
                             ),
                             FilledButton(
@@ -581,8 +622,8 @@ class _ActionButton extends StatelessWidget {
     final color = onPressed == null
         ? scheme.onSurfaceVariant.withValues(alpha: 0.35)
         : danger
-            ? const Color(0xFFC0554F)
-            : scheme.onSurface;
+        ? const Color(0xFFC0554F)
+        : scheme.onSurface;
 
     return Expanded(
       child: InkWell(
@@ -609,10 +650,9 @@ class _ActionButton extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(color: color),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelSmall?.copyWith(color: color),
                 ),
               ],
             ],
@@ -649,8 +689,8 @@ class _ResultSheet extends StatelessWidget {
     final accent = result.isDraw
         ? theme.colorScheme.onSurfaceVariant
         : won
-            ? const Color(0xFF3F9D6B)
-            : const Color(0xFFC0554F);
+        ? const Color(0xFF3F9D6B)
+        : const Color(0xFFC0554F);
 
     return Material(
       color: theme.colorScheme.surface,
@@ -675,8 +715,8 @@ class _ResultSheet extends StatelessWidget {
                 result.isDraw
                     ? Icons.handshake_outlined
                     : won
-                        ? Icons.emoji_events_outlined
-                        : Icons.sentiment_dissatisfied_outlined,
+                    ? Icons.emoji_events_outlined
+                    : Icons.sentiment_dissatisfied_outlined,
                 size: 44,
                 color: accent,
               ),

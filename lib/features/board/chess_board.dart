@@ -75,8 +75,7 @@ class ChessBoard extends StatefulWidget {
   State<ChessBoard> createState() => _ChessBoardState();
 }
 
-class _ChessBoardState extends State<ChessBoard>
-    with SingleTickerProviderStateMixin {
+class _ChessBoardState extends State<ChessBoard> with TickerProviderStateMixin {
   static const _animationDuration = Duration(milliseconds: 180);
   static const _captureDuration = Duration(milliseconds: 260);
 
@@ -95,6 +94,15 @@ class _ChessBoardState extends State<ChessBoard>
   /// geriye sabit kırmızı vurgu kalır.
   late final AnimationController _checkPulse;
 
+  /// Taş seçildiğinde hamle noktalarını sırayla açar.
+  late final AnimationController _selection;
+
+  /// Son hamle vurgusunu yumuşakça belirtir.
+  late final AnimationController _lastMove;
+
+  /// Tahta ilk kurulduğunda taşları sırayla yerleştirir.
+  late final AnimationController _entrance;
+
   @override
   void initState() {
     super.initState();
@@ -102,13 +110,31 @@ class _ChessBoardState extends State<ChessBoard>
       vsync: this,
       duration: const Duration(milliseconds: 820),
     );
+    _selection = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+    _lastMove = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _entrance = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 620),
+    );
     _syncPieces(widget.position, animate: false);
     if (widget.checkedSquare != null) _checkPulse.forward(from: 0);
+    if (widget.selectedSquare != null) _selection.value = 1;
+    if (widget.lastMove != null) _lastMove.value = 1;
+    _entrance.forward();
   }
 
   @override
   void dispose() {
     _checkPulse.dispose();
+    _selection.dispose();
+    _lastMove.dispose();
+    _entrance.dispose();
     super.dispose();
   }
 
@@ -123,6 +149,22 @@ class _ChessBoardState extends State<ChessBoard>
       _checkPulse.forward(from: 0);
     } else if (square == null) {
       _checkPulse.value = 0;
+    }
+
+    if (widget.selectedSquare != oldWidget.selectedSquare) {
+      if (widget.selectedSquare != null) {
+        _selection.forward(from: 0);
+      } else {
+        _selection.value = 0;
+      }
+    }
+
+    if (widget.lastMove != oldWidget.lastMove) {
+      if (widget.lastMove != null) {
+        _lastMove.forward(from: 0);
+      } else {
+        _lastMove.value = 0;
+      }
     }
   }
 
@@ -311,6 +353,11 @@ class _ChessBoardState extends State<ChessBoard>
     final baseColor = isLight ? theme.light : theme.dark;
 
     final isChecked = widget.checkedSquare == square;
+    final isLastMove =
+        !isChecked &&
+        widget.selectedSquare != square &&
+        widget.lastMove != null &&
+        (widget.lastMove!.$1 == square || widget.lastMove!.$2 == square);
 
     Color? overlay;
     if (isChecked) {
@@ -333,7 +380,14 @@ class _ChessBoardState extends State<ChessBoard>
         children: [
           Positioned.fill(child: ColoredBox(color: baseColor)),
           if (overlay != null)
-            Positioned.fill(child: ColoredBox(color: overlay)),
+            Positioned.fill(
+              child: isLastMove
+                  ? FadeTransition(
+                      opacity: _lastMove,
+                      child: ColoredBox(color: overlay),
+                    )
+                  : ColoredBox(color: overlay),
+            ),
           if (isChecked)
             Positioned.fill(
               child: AnimatedBuilder(
@@ -390,17 +444,30 @@ class _ChessBoardState extends State<ChessBoard>
 
   Widget _buildDestinations(double squareSize) {
     if (widget.legalDestinations.isEmpty) return const SizedBox.shrink();
+    final squares = widget.legalDestinations.toList();
     return IgnorePointer(
       child: Stack(
         children: [
-          for (final square in widget.legalDestinations)
-            _destinationMarker(square, squareSize),
+          for (int i = 0; i < squares.length; i++)
+            _destinationMarker(squares[i], squareSize, i, squares.length),
         ],
       ),
     );
   }
 
-  Widget _destinationMarker(Square square, double squareSize) {
+  /// Noktalar aynı anda değil, kısa gecikmelerle belirir; hangi karelerin
+  /// açıldığı böylece gözle takip edilebilir.
+  Widget _destinationMarker(
+    Square square,
+    double squareSize,
+    int index,
+    int total,
+  ) {
+    final start = total <= 1 ? 0.0 : (index / total) * 0.45;
+    final animation = CurvedAnimation(
+      parent: _selection,
+      curve: Interval(start, 1, curve: Curves.easeOutBack),
+    );
     final (row, col) = _cellOfSquare(square);
     final isCapture = widget.position.board.pieceAt(square) != null;
     return Positioned(
@@ -408,27 +475,30 @@ class _ChessBoardState extends State<ChessBoard>
       top: row * squareSize,
       width: squareSize,
       height: squareSize,
-      child: Center(
-        child: isCapture
-            ? Container(
-                width: squareSize * 0.92,
-                height: squareSize * 0.92,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.black.withValues(alpha: 0.28),
-                    width: squareSize * 0.09,
+      child: ScaleTransition(
+        scale: animation,
+        child: Center(
+          child: isCapture
+              ? Container(
+                  width: squareSize * 0.92,
+                  height: squareSize * 0.92,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.black.withValues(alpha: 0.28),
+                      width: squareSize * 0.09,
+                    ),
+                  ),
+                )
+              : Container(
+                  width: squareSize * 0.28,
+                  height: squareSize * 0.28,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withValues(alpha: 0.22),
                   ),
                 ),
-              )
-            : Container(
-                width: squareSize * 0.28,
-                height: squareSize * 0.28,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black.withValues(alpha: 0.22),
-                ),
-              ),
+        ),
       ),
     );
   }
@@ -445,15 +515,44 @@ class _ChessBoardState extends State<ChessBoard>
           width: squareSize,
           height: squareSize,
           child: IgnorePointer(
-            child: PieceWidget(
-              piece: tracked.piece,
-              size: squareSize,
-              pieceSet: widget.pieceSet,
-              opacity: _dragFrom == tracked.square ? 0.28 : 1.0,
+            child: _entranceWrap(
+              tracked,
+              // Seçili taş hafifçe kalkar: hangi taşı tuttuğun tahtaya
+              // bakmadan da bellidir.
+              AnimatedScale(
+                scale: widget.selectedSquare == tracked.square ? 1.12 : 1.0,
+                duration: const Duration(milliseconds: 140),
+                curve: Curves.easeOut,
+                child: PieceWidget(
+                  piece: tracked.piece,
+                  size: squareSize,
+                  pieceSet: widget.pieceSet,
+                  opacity: _dragFrom == tracked.square ? 0.28 : 1.0,
+                ),
+              ),
             ),
           ),
         ),
     ];
+  }
+
+  /// Tahta ilk açıldığında taşlar üst sıradan alta doğru sırayla yerleşir.
+  /// Animasyon bittikten sonra hiçbir etkisi kalmaz.
+  Widget _entranceWrap(_TrackedPiece tracked, Widget child) {
+    if (_entrance.isCompleted) return child;
+    final row = _cellOfSquare(tracked.square).$1;
+    final start = (row / 8) * 0.5;
+    return ScaleTransition(
+      scale: CurvedAnimation(
+        parent: _entrance,
+        curve: Interval(
+          start,
+          (start + 0.5).clamp(0.0, 1.0),
+          curve: Curves.easeOutBack,
+        ),
+      ),
+      child: child,
+    );
   }
 
   /// Kalkan taşları büyüterek soldurur, bitince listeden düşürür.

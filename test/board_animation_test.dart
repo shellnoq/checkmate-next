@@ -10,7 +10,13 @@ import 'package:checkmate_next/features/board/piece_widget.dart';
 /// widget ağacındaki durum üzerinden ölçüm yapılır; böylece yazı tipi ve çizim
 /// arka ucundan bağımsız çalışır.
 void main() {
-  Widget board(Position position, {Square? checked}) => MaterialApp(
+  Widget board(
+    Position position, {
+    Square? checked,
+    Square? selected,
+    Set<Square> dests = const {},
+    (Square, Square)? lastMove,
+  }) => MaterialApp(
     home: Scaffold(
       body: Center(
         child: SizedBox(
@@ -22,6 +28,9 @@ void main() {
             boardTheme: BoardTheme.walnut,
             pieceSet: PieceSet.classic,
             checkedSquare: checked,
+            selectedSquare: selected,
+            legalDestinations: dests,
+            lastMove: lastMove,
             interactive: false,
           ),
         ),
@@ -30,6 +39,54 @@ void main() {
   );
 
   Position pos(String fen) => Chess.fromSetup(Setup.parseFen(fen));
+
+  group('tahta açılışı ve seçim', () {
+    testWidgets('tahta ilk kurulduğunda taşlar sırayla yerleşir', (
+      tester,
+    ) async {
+      await tester.pumpWidget(board(pos(kInitialFEN)));
+      await tester.pump(const Duration(milliseconds: 80));
+      expect(
+        tester.binding.hasScheduledFrame,
+        isTrue,
+        reason: 'açılış animasyonu çalışmalı',
+      );
+
+      await tester.pumpAndSettle();
+      expect(tester.binding.hasScheduledFrame, isFalse);
+      expect(tester.widgetList(find.byType(PieceWidget)).length, 32);
+    });
+
+    testWidgets('taş seçilince hamle noktaları sırayla belirir', (
+      tester,
+    ) async {
+      final start = pos(kInitialFEN);
+      await tester.pumpWidget(board(start));
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(
+        board(start, selected: Square.e2, dests: const {Square.e3, Square.e4}),
+      );
+      await tester.pump(const Duration(milliseconds: 40));
+      expect(tester.binding.hasScheduledFrame, isTrue);
+
+      await tester.pumpAndSettle();
+      expect(tester.binding.hasScheduledFrame, isFalse);
+    });
+
+    testWidgets('son hamle vurgusu yumuşak belirir ve oturur', (tester) async {
+      final start = pos(kInitialFEN);
+      await tester.pumpWidget(board(start));
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(board(start, lastMove: (Square.e2, Square.e4)));
+      await tester.pump(const Duration(milliseconds: 40));
+      expect(tester.binding.hasScheduledFrame, isTrue);
+
+      await tester.pumpAndSettle();
+      expect(tester.binding.hasScheduledFrame, isFalse);
+    });
+  });
 
   group('şah uyarısı', () {
     testWidgets('şah çekilince sönümlü vuruş oynar ve kendiliğinden durur', (

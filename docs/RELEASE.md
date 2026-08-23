@@ -84,9 +84,12 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 Mağaza metinleri `docs/store/` altındadır. Gereken görseller:
 
-- Uygulama ikonu 512×512 PNG — `assets/icon/play_store_512.png`
-- Öne çıkan görsel 1024×500
-- En az 2 telefon ekran görüntüsü (16:9 ya da 9:16, kısa kenar ≥ 320 px)
+| Varlık | Dosya |
+|---|---|
+| Uygulama ikonu 512×512 | `assets/icon/play_store_512.png` |
+| Öne çıkan görsel 1024×500 (tr) | `docs/store/graphics/feature-graphic-tr.png` |
+| Öne çıkan görsel 1024×500 (en) | `docs/store/graphics/feature-graphic-en.png` |
+| Telefon ekran görüntüleri | `docs/screenshots/` (en az 2 tane, kısa kenar ≥ 320 px) |
 
 ## 5. Veri güvenliği formu
 

@@ -58,11 +58,13 @@ android {
         versionName = flutter.versionName
 
         // Motor kitaplığı NNUE ağlarını gömülü taşıdığı için ABI başına
-        // ~114 MB'dır. Yalnızca arm64-v8a paketlenir: 32 bit cihazlar bu
-        // boyuttaki bir motoru zaten rahat çalıştıramaz, x86_64 ise emülatör
-        // dışında kullanılmaz (Apple Silicon emülatörleri de arm64'tür).
+        // ~114 MB'dır ve her ek mimari yüklenecek paketi büyütür. Yine de
+        // armeabi-v7a paketlenir: aksi hâlde 32 bit cihazlar Play'de
+        // "uyumlu değil" görür ve uygulamayı hiç kuramaz. Play mimariye göre
+        // böldüğü için cihaza inen boyut bundan etkilenmez.
+        // x86_64 yalnızca emülatörlerde kullanılır, o yüzden dışarıda kalır.
         ndk {
-            abiFilters += listOf("arm64-v8a")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
 
     }
@@ -120,11 +122,7 @@ android {
         jniLibs {
             // Eklenti modülü x86_64'ü de derliyor; ndk.abiFilters önceden
             // derlenmiş jniLibs'i süzmediği için paketleme aşamasında elenir.
-            excludes += setOf(
-                "**/x86_64/*.so",
-                "**/x86/*.so",
-                "**/armeabi-v7a/*.so",
-            )
+            excludes += setOf("**/x86_64/*.so", "**/x86/*.so")
         }
     }
 }

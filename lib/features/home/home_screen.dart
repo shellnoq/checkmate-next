@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/providers/settings.dart';
 import '../../core/l10n/strings.dart';
 import '../../core/storage/app_storage.dart';
+import '../../core/utils/app_version.dart';
 import '../board/piece_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -79,7 +80,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const SizedBox(height: 24),
                   Center(
                     child: Text(
-                      'Stockfish',
+                      AppVersion.label.isEmpty
+                          ? 'Stockfish'
+                          : 'Stockfish · ${AppVersion.label}',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant.withValues(
                           alpha: 0.6,

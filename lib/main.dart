@@ -11,10 +11,12 @@ import 'app/theme/app_theme.dart';
 import 'core/audio/sound_service.dart';
 import 'core/l10n/strings.dart';
 import 'core/storage/app_storage.dart';
+import 'core/utils/app_version.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppStorage.init();
+  await AppVersion.load();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

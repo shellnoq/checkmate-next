@@ -6,6 +6,7 @@ import '../../app/theme/board_theme.dart';
 import '../../core/audio/sound_service.dart';
 import '../../core/l10n/strings.dart';
 import '../../core/utils/age_group.dart';
+import '../../core/utils/app_version.dart';
 import '../../core/storage/app_storage.dart';
 import '../board/piece_set.dart';
 
@@ -248,9 +249,14 @@ class SettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.info_outline),
             title: Text(s.about),
             subtitle: Text(
-              settings.turkish
-                  ? 'Motor: Stockfish (GPLv3). Kural motoru: dartchess.'
-                  : 'Engine: Stockfish (GPLv3). Rules: dartchess.',
+              [
+                if (AppVersion.label.isNotEmpty)
+                  '${settings.turkish ? 'Sürüm' : 'Version'} '
+                      '${AppVersion.label}',
+                settings.turkish
+                    ? 'Motor: Stockfish (GPLv3). Kural motoru: dartchess.'
+                    : 'Engine: Stockfish (GPLv3). Rules: dartchess.',
+              ].join('\n'),
             ),
           ),
           ListTile(

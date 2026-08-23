@@ -10,6 +10,21 @@ plugins {
 
 // Yayın imzası android/key.properties dosyasından okunur. Bu dosya ve
 // keystore sürüm kontrolüne girmez; kurulumu docs/RELEASE.md anlatır.
+// Sürüm kodu git commit sayısından türetilir: her commit ile kendiliğinden
+// artar, elle güncellemeyi unutmak mümkün olmaz ve Play'in "sürüm kodu daha
+// önce kullanıldı" hatası tekrarlanmaz. Git yoksa pubspec'teki değere düşer.
+val gitVersionCode: Int = try {
+    val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
+        .directory(rootProject.projectDir.parentFile)
+        .redirectErrorStream(true)
+        .start()
+    val output = process.inputStream.bufferedReader().readText().trim()
+    process.waitFor()
+    output.toIntOrNull() ?: 0
+} catch (e: Exception) {
+    0
+}
+
 val keystorePropertiesFile = rootProject.file("key.properties")
 val keystoreProperties = Properties()
 val hasReleaseKeystore = keystorePropertiesFile.exists()
@@ -37,7 +52,9 @@ android {
         // ve 64 bit desteği güvenilir olsun diye taban 24'e çekilmiştir.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
+        // İkisinin büyüğü alınır; böylece pubspec'te elle yükseltilen bir
+        // değer git sayısının gerisinde kalsa bile sürüm kodu asla düşmez.
+        versionCode = maxOf(gitVersionCode, flutter.versionCode)
         versionName = flutter.versionName
 
         // Motor kitaplığı NNUE ağlarını gömülü taşıdığı için ABI başına

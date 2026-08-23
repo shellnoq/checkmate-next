@@ -18,9 +18,25 @@ class AppStorage {
 
   static Future<void> init() async {
     await Hive.initFlutter();
+    await _openBoxes();
+  }
+
+  /// Testlerde kullanılır: platform kanalı gerektiren `initFlutter` yerine
+  /// verilen dizini kullanır, böylece depolama gerçek davranışıyla ölçülebilir.
+  static Future<void> initForTesting(String directory) async {
+    Hive.init(directory);
+    await _openBoxes();
+  }
+
+  static Future<void> _openBoxes() async {
     _settings = await Hive.openBox(_settingsBox);
     _archive = await Hive.openBox(_archiveBox);
     _stats = await Hive.openBox(_statsBox);
+  }
+
+  /// Testlerde kutuları kapatıp durumu sıfırlar.
+  static Future<void> closeForTesting() async {
+    await Hive.close();
   }
 
   // ── Ayarlar ──

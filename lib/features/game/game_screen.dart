@@ -40,6 +40,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
   /// aynı sürenin iki kez sayılmasını önler.
   Duration _flushedPlaytime = Duration.zero;
 
+  /// Terfi penceresi açıkken yeniden açılmasını engeller. Denetleyici saat
+  /// atımında ve motor değerlendirmesinde de bildirim ürettiği için, bu
+  /// koruma olmadan terfi beklerken pencere üst üste yığılır.
+  bool _promotionSheetOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -181,7 +186,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   Future<void> _showPromotionSheet() async {
     final controller = _controller;
-    if (controller == null) return;
+    if (controller == null || _promotionSheetOpen) return;
     final settings = ref.read(settingsProvider);
 
     if (settings.autoQueenPromotion) {
@@ -190,25 +195,30 @@ class _GameScreenState extends ConsumerState<GameScreen>
     }
 
     final s = S.of(context);
-    await showModalBottomSheet<void>(
-      context: context,
-      isDismissible: false,
-      enableDrag: false,
-      backgroundColor: Colors.transparent,
-      builder: (context) => PromotionSheet(
-        side: controller.position.turn,
-        pieceSet: settings.pieceSet,
-        title: s.promotion,
-        onSelected: (role) {
-          Navigator.of(context).pop();
-          controller.completePromotion(role);
-        },
-        onCancel: () {
-          Navigator.of(context).pop();
-          controller.cancelPromotion();
-        },
-      ),
-    );
+    _promotionSheetOpen = true;
+    try {
+      await showModalBottomSheet<void>(
+        context: context,
+        isDismissible: false,
+        enableDrag: false,
+        backgroundColor: Colors.transparent,
+        builder: (context) => PromotionSheet(
+          side: controller.position.turn,
+          pieceSet: settings.pieceSet,
+          title: s.promotion,
+          onSelected: (role) {
+            Navigator.of(context).pop();
+            controller.completePromotion(role);
+          },
+          onCancel: () {
+            Navigator.of(context).pop();
+            controller.cancelPromotion();
+          },
+        ),
+      );
+    } finally {
+      _promotionSheetOpen = false;
+    }
   }
 
   Future<void> _showResultSheet() async {
@@ -401,7 +411,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    const barHeight = 62.0;
+                    // Ad, alt yazı ("Düşünüyor…") ve alınan taşlar satırı
+                    // üst üste geldiğinde 62 piksel yetmiyordu.
+                    const barHeight = 74.0;
                     final evalWidth = settings.showEvaluation ? 22.0 : 0.0;
                     // Tahta grubu ekranın en çok %72'sini alır; kalan alan
                     // notasyon paneline bırakılır. Kısa ekranlarda tahta

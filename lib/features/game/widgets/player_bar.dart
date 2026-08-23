@@ -131,6 +131,8 @@ class _CapturedRow extends StatelessWidget {
     Role.queen,
   ];
 
+  static const _iconWidth = 13.0;
+
   @override
   Widget build(BuildContext context) {
     final sorted = [
@@ -138,30 +140,66 @@ class _CapturedRow extends StatelessWidget {
     ];
     final theme = Theme.of(context);
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final role in sorted)
-          SizedBox(
-            width: 13,
-            height: 16,
-            child: SvgPicture.string(
-              PieceSvg.of(Piece(color: capturedSide, role: role), pieceSet),
-              fit: BoxFit.contain,
-            ),
-          ),
-        if (advantage > 0)
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              '+$advantage',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
+    // Oyun ilerledikçe alınan taş sayısı artar ve sabit bir satır taşar.
+    // Sığan kadarı çizilir, kalanı sayıyla belirtilir.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const advantageWidth = 30.0;
+        const overflowLabelWidth = 26.0;
+
+        final iconBudget =
+            constraints.maxWidth - (advantage > 0 ? advantageWidth : 0.0);
+
+        final Iterable<Role> shown;
+        final int remaining;
+        if (sorted.length * _iconWidth <= iconBudget) {
+          shown = sorted;
+          remaining = 0;
+        } else {
+          final capacity = ((iconBudget - overflowLabelWidth) / _iconWidth)
+              .floor();
+          final count = capacity.clamp(0, sorted.length);
+          shown = sorted.take(count);
+          remaining = sorted.length - count;
+        }
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final role in shown)
+              SizedBox(
+                width: _iconWidth,
+                height: 16,
+                child: SvgPicture.string(
+                  PieceSvg.of(Piece(color: capturedSide, role: role), pieceSet),
+                  fit: BoxFit.contain,
+                ),
               ),
-            ),
-          ),
-      ],
+            if (remaining > 0)
+              SizedBox(
+                width: overflowLabelWidth,
+                child: Text(
+                  '+$remaining',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            if (advantage > 0)
+              SizedBox(
+                width: advantageWidth,
+                child: Text(
+                  '+$advantage',
+                  textAlign: TextAlign.right,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

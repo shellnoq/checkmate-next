@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Satranç Ustası</string>
+    <!-- Uygulama adı her dilde aynıdır; dile göre çeviri yapılmaz. -->
+    <string name="app_name">CheckMate Next</string>
 </resources>

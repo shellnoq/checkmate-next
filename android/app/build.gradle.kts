@@ -18,7 +18,7 @@ if (hasReleaseKeystore) {
 }
 
 android {
-    namespace = "com.e2esolutions.satranc"
+    namespace = "com.e2esolutions.chess"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -32,7 +32,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.e2esolutions.satranc"
+        applicationId = "com.e2esolutions.chess"
         // Stockfish eklentisi 21'i destekler; NNUE değerlendirmesi için bellek
         // ve 64 bit desteği güvenilir olsun diye taban 24'e çekilmiştir.
         minSdk = 24

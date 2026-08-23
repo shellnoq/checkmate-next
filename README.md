@@ -1,6 +1,6 @@
-# Satranç Ustası · Chess Master
+# CheckMate Next
 
-[![CI](https://github.com/shellnoq/chess-master/actions/workflows/ci.yml/badge.svg)](https://github.com/shellnoq/chess-master/actions/workflows/ci.yml)
+[![CI](https://github.com/shellnoq/checkmate-next/actions/workflows/ci.yml/badge.svg)](https://github.com/shellnoq/checkmate-next/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41-blue.svg)](https://flutter.dev)
 [![Engine](https://img.shields.io/badge/engine-Stockfish-green.svg)](https://stockfishchess.org)

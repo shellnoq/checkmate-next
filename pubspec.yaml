@@ -1,5 +1,5 @@
-name: satranc
-description: "Satranç Ustası — Stockfish destekli profesyonel satranç uygulaması."
+name: checkmate_next
+description: "CheckMate Next — Stockfish destekli profesyonel satranç uygulaması."
 publish_to: 'none'
 
 # versionName+versionCode. Play Store yüklemesinde versionCode her zaman artmalıdır.

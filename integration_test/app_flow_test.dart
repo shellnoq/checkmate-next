@@ -2,8 +2,8 @@ import 'package:dartchess/dartchess.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:satranc/features/board/chess_board.dart';
-import 'package:satranc/main.dart' as app;
+import 'package:checkmate_next/features/board/chess_board.dart';
+import 'package:checkmate_next/main.dart' as app;
 
 /// Uygulamayı gerçek cihazda baştan sona sürer.
 ///

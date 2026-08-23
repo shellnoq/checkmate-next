@@ -3,13 +3,13 @@ import 'dart:math';
 import 'package:dartchess/dartchess.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:satranc/domain/game_controller.dart';
-import 'package:satranc/domain/match/engine_match_transport.dart';
-import 'package:satranc/domain/match/match_protocol.dart';
-import 'package:satranc/domain/model/difficulty.dart';
-import 'package:satranc/domain/model/time_control.dart';
-import 'package:satranc/engine/engine_models.dart';
-import 'package:satranc/engine/stockfish_engine.dart';
+import 'package:checkmate_next/domain/game_controller.dart';
+import 'package:checkmate_next/domain/match/engine_match_transport.dart';
+import 'package:checkmate_next/domain/match/match_protocol.dart';
+import 'package:checkmate_next/domain/model/difficulty.dart';
+import 'package:checkmate_next/domain/model/time_control.dart';
+import 'package:checkmate_next/engine/engine_models.dart';
+import 'package:checkmate_next/engine/stockfish_engine.dart';
 
 /// Gerçek cihazda Stockfish'i çalıştıran doğrulamalar.
 ///

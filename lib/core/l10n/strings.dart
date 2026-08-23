@@ -16,7 +16,7 @@ class S {
   String _(String turkish, String english) => tr ? turkish : english;
 
   // Genel
-  String get appName => 'Satranç Ustası';
+  String get appName => 'CheckMate Next';
   String get play => _('Oyna', 'Play');
   String get cancel => _('Vazgeç', 'Cancel');
   String get ok => _('Tamam', 'OK');

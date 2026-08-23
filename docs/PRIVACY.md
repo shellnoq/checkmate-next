@@ -1,10 +1,10 @@
-# Gizlilik Politikası — Satranç Ustası
+# Gizlilik Politikası — CheckMate Next
 
 Son güncelleme: 23 Ağustos 2026
 
 ## Kısaca
 
-Satranç Ustası hiçbir kişisel veri toplamaz, saklamaz ya da üçüncü taraflarla
+CheckMate Next hiçbir kişisel veri toplamaz, saklamaz ya da üçüncü taraflarla
 paylaşmaz. Uygulama internet bağlantısı kullanmaz.
 
 ## Cihazda saklanan veriler

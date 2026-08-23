@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:satranc/domain/model/difficulty.dart';
+import 'package:checkmate_next/domain/model/difficulty.dart';
 
 void main() {
   group('DifficultyLevel', () {

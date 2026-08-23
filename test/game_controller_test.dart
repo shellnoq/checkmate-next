@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:dartchess/dartchess.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:satranc/domain/game_controller.dart';
-import 'package:satranc/domain/match/match_protocol.dart';
-import 'package:satranc/domain/match/match_transport.dart';
-import 'package:satranc/domain/model/time_control.dart';
+import 'package:checkmate_next/domain/game_controller.dart';
+import 'package:checkmate_next/domain/match/match_protocol.dart';
+import 'package:checkmate_next/domain/match/match_transport.dart';
+import 'package:checkmate_next/domain/model/time_control.dart';
 
 /// Testlerde rakip yerine geçen, gönderilen komutları kaydeden taşıma katmanı.
 class FakeTransport implements MatchTransport {

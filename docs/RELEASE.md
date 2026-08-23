@@ -76,9 +76,8 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 | Alan | Değer |
 |---|---|
-| Paket adı | `com.e2esolutions.satranc` |
-| Uygulama adı (tr) | Satranç Ustası |
-| Uygulama adı (en) | Chess Master |
+| Paket adı | `com.e2esolutions.chess` |
+| Uygulama adı | CheckMate Next (her dilde aynı) |
 | Kategori | Oyunlar → Tahta oyunu |
 | Hedef API | Flutter'ın güncel varsayılanı (`targetSdk`) |
 | Minimum API | 24 (Android 7.0) |

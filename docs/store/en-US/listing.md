@@ -2,7 +2,7 @@
 
 ## App name (30 characters)
 
-Chess Master
+CheckMate Next
 
 ## Short description (80 characters)
 
@@ -10,7 +10,7 @@ Chess powered by Stockfish. Eight difficulty levels, works fully offline.
 
 ## Full description (4000 characters)
 
-Chess Master brings a genuine chess experience with the Stockfish engine running
+CheckMate Next brings a genuine chess experience with the Stockfish engine running
 directly on your device. Choose from eight levels — from an opponent that hangs
 pieces for absolute beginners, to the engine at full strength that human players
 cannot realistically beat.
@@ -56,7 +56,7 @@ data, and contains no advertising.
 
 ## Keywords
 
-chess, stockfish, chess engine, offline chess, single player chess, chess
+chess, checkmate, stockfish, chess engine, offline chess, single player chess, chess
 tactics, learn chess, chess board game
 
 ## Category

@@ -605,8 +605,8 @@ class GameController extends ChangeNotifier {
         '${stamp.month.toString().padLeft(2, '0')}.'
         '${stamp.day.toString().padLeft(2, '0')}';
 
-    buffer.writeln('[Event "${event ?? 'Satranç Ustası'}"]');
-    buffer.writeln('[Site "Satranç Ustası"]');
+    buffer.writeln('[Event "${event ?? 'CheckMate Next'}"]');
+    buffer.writeln('[Site "CheckMate Next"]');
     buffer.writeln('[Date "$dateTag"]');
     buffer.writeln('[Round "-"]');
     buffer.writeln('[White "${white ?? _defaultName(Side.white)}"]');

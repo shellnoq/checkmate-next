@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:satranc/engine/uci_parser.dart';
+import 'package:checkmate_next/engine/uci_parser.dart';
 
 void main() {
   group('UciParser.parseInfo', () {

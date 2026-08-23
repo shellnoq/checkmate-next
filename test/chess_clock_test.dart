@@ -1,7 +1,7 @@
 import 'package:dartchess/dartchess.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:satranc/domain/chess_clock.dart';
-import 'package:satranc/domain/model/time_control.dart';
+import 'package:checkmate_next/domain/chess_clock.dart';
+import 'package:checkmate_next/domain/model/time_control.dart';
 
 void main() {
   group('ChessClock', () {

@@ -4,9 +4,9 @@ library;
 import 'package:dartchess/dartchess.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:satranc/app/theme/board_theme.dart';
-import 'package:satranc/features/board/chess_board.dart';
-import 'package:satranc/features/board/piece_set.dart';
+import 'package:checkmate_next/app/theme/board_theme.dart';
+import 'package:checkmate_next/features/board/chess_board.dart';
+import 'package:checkmate_next/features/board/piece_set.dart';
 
 /// Tahtanın ve taş takımlarının görünümünü sabitler.
 ///

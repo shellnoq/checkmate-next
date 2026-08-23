@@ -2,7 +2,7 @@
 
 ## Uygulama adı (30 karakter)
 
-Satranç Ustası
+CheckMate Next
 
 ## Kısa açıklama (80 karakter)
 
@@ -10,7 +10,7 @@ Stockfish motorlu satranç. Sekiz zorluk kademesi, internet gerekmez.
 
 ## Tam açıklama (4000 karakter)
 
-Satranç Ustası, cihazınızda çalışan Stockfish motoruyla gerçek bir satranç
+CheckMate Next, cihazınızda çalışan Stockfish motoruyla gerçek bir satranç
 deneyimi sunar. Yeni başlayanlar için taş bırakan bir rakipten, insan
 oyuncuların pratikte yenemeyeceği tam güçlü motora kadar sekiz kademe arasında
 seçim yaparsınız.
@@ -55,7 +55,7 @@ göndermez, reklam içermez.
 
 ## Anahtar kelimeler
 
-satranç, chess, stockfish, satranç oyunu, tek kişilik satranç, satranç motoru,
+satranç, chess, checkmate, stockfish, satranç oyunu, tek kişilik satranç, satranç motoru,
 offline satranç, satranç taktik, satranç öğren
 
 ## Kategori

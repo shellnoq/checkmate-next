@@ -1,4 +1,4 @@
-package com.e2esolutions.satranc
+package com.e2esolutions.chess
 
 import io.flutter.embedding.android.FlutterActivity
 

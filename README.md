@@ -101,3 +101,4 @@ ve bu lisans tüm dağıtımı kapsar. Yükümlülüklerin ayrıntısı:
 | `docs/LICENSING.md` | Stockfish GPLv3 yükümlülüğü |
 | `docs/privacy.md` | Gizlilik politikası metni |
 | `docs/store/` | Mağaza listeleme metinleri (tr-TR, en-US) |
+| `docs/ROADMAP.md` | Sıradaki özellikler ve ertelenen kararlar |

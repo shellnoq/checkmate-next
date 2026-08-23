@@ -57,9 +57,12 @@ Beklenen ölçüler:
 
 | Ölçü | Değer |
 |---|---|
-| Paket (.aab) dosyası | ~172 MB |
+| Paket (.aab) dosyası | ~84 MB |
 | arm64-v8a cihaz indirmesi | ~83 MB |
-| armeabi-v7a cihaz indirmesi | ~82 MB |
+
+Paket yalnızca `arm64-v8a` içerir. 32 bit (`armeabi-v7a`) desteği bilerek
+çıkarılmıştır: motor kitaplığı açılmış hâlde ~114 MB'dır ve o sınıf cihazlarda
+zaten kullanışlı çalışmaz; çıkarılması yüklenecek paketi yarıya indirir.
 
 Boyutun tamamına yakını Stockfish'in gömülü NNUE ağlarından gelir
 (`libstockfish.so`, ABI başına ~114 MB açılmış). Play'in 200 MB'lık temel

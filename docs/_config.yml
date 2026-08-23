@@ -1,0 +1,12 @@
+title: CheckMate Next
+description: Stockfish destekli, tümüyle cihazda çalışan açık kaynak satranç uygulaması
+theme: jekyll-theme-minimal
+lang: tr
+
+# Geliştirme belgeleri ve mağaza metinleri siteye çıkmaz; depoda okunabilir
+# durumdalar, ayrıca web sayfası olarak yayımlanmalarına gerek yok.
+exclude:
+  - RELEASE.md
+  - LICENSING.md
+  - ONLINE.md
+  - store/

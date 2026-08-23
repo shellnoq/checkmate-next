@@ -99,5 +99,5 @@ ve bu lisans tüm dağıtımı kapsar. Yükümlülüklerin ayrıntısı:
 | `docs/RELEASE.md` | Play Store yayın adımları ve kontrol listesi |
 | `docs/ONLINE.md` | Online moda geçiş mimarisi ve sunucu sözleşmesi |
 | `docs/LICENSING.md` | Stockfish GPLv3 yükümlülüğü |
-| `docs/PRIVACY.md` | Gizlilik politikası metni |
+| `docs/privacy.md` | Gizlilik politikası metni |
 | `docs/store/` | Mağaza listeleme metinleri (tr-TR, en-US) |

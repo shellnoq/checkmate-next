@@ -112,7 +112,7 @@ Everyone.
 ## 7. Gizlilik politikası
 
 Play Console gizlilik politikası için erişilebilir bir URL ister. Metin
-`docs/PRIVACY.md` içindedir; bir web adresinde yayınlanıp bağlantısı verilir.
+`docs/privacy.md` içindedir; bir web adresinde yayınlanıp bağlantısı verilir.
 
 ## 8. Lisans
 

@@ -1,3 +1,9 @@
+---
+layout: default
+title: Gizlilik Politikası
+permalink: /privacy/
+---
+
 # Gizlilik Politikası — CheckMate Next
 
 Son güncelleme: 23 Ağustos 2026

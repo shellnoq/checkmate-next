@@ -56,7 +56,7 @@ Küçük yaş grubunda daha büyük, daha renkli ve daha "canlı" taşlar; ileri
 yaşta bugünkü sade takım. Taş takımı altyapısı (`PieceSet` + `PieceSvg`)
 buna hazır: yeni bir takım tanımlamak renk ve şekil verisi eklemekten ibaret.
 
-### Ebeveuyn kontrolü
+### Ebeveyn kontrolü
 Ebeveynin görebileceği bir bölüm: çocuğun hangi zorluk kademesinde ne kadar
 süre oynadığı, kaç oyun bitirdiği, galibiyet dağılımı. Oturum süresi sınırı
 koyabilme. Bölüme PIN ile giriş.

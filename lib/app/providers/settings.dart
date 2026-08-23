@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/storage/app_storage.dart';
+import '../../core/utils/age_group.dart';
 import '../../domain/model/difficulty.dart';
 import '../../domain/model/time_control.dart';
 import '../../features/board/piece_set.dart';
@@ -22,6 +23,7 @@ class AppSettings {
   final bool autoQueenPromotion;
   final DifficultyLevel lastDifficulty;
   final TimeControl lastTimeControl;
+  final AgeGroup ageGroup;
 
   const AppSettings({
     required this.locale,
@@ -36,6 +38,7 @@ class AppSettings {
     required this.autoQueenPromotion,
     required this.lastDifficulty,
     required this.lastTimeControl,
+    required this.ageGroup,
   });
 
   bool get turkish => locale.languageCode == 'tr';
@@ -53,6 +56,7 @@ class AppSettings {
     bool? autoQueenPromotion,
     DifficultyLevel? lastDifficulty,
     TimeControl? lastTimeControl,
+    AgeGroup? ageGroup,
   }) => AppSettings(
     locale: locale ?? this.locale,
     themeMode: themeMode ?? this.themeMode,
@@ -66,6 +70,7 @@ class AppSettings {
     autoQueenPromotion: autoQueenPromotion ?? this.autoQueenPromotion,
     lastDifficulty: lastDifficulty ?? this.lastDifficulty,
     lastTimeControl: lastTimeControl ?? this.lastTimeControl,
+    ageGroup: ageGroup ?? this.ageGroup,
   );
 
   static AppSettings load() => AppSettings(
@@ -91,6 +96,7 @@ class AppSettings {
     lastTimeControl: TimeControl.fromId(
       AppStorage.get<String>('timeControl', 'rapid10'),
     ),
+    ageGroup: AgeGroup.fromId(AppStorage.get<String>('ageGroup', 'adult')),
   );
 }
 
@@ -145,6 +151,14 @@ class SettingsController extends StateNotifier<AppSettings> {
   Future<void> setAutoQueen(bool value) async {
     state = state.copyWith(autoQueenPromotion: value);
     await AppStorage.set('autoQueen', value);
+  }
+
+  /// Yaş grubunu değiştirir ve o gruba uygun taş takımını uygular.
+  /// Kullanıcı taş takımını sonradan yine serbestçe değiştirebilir.
+  Future<void> setAgeGroup(AgeGroup group) async {
+    state = state.copyWith(ageGroup: group, pieceSet: group.suggestedPieceSet);
+    await AppStorage.set('ageGroup', group.id);
+    await AppStorage.set('pieceSet', group.suggestedPieceSet.id);
   }
 
   Future<void> rememberSetup(

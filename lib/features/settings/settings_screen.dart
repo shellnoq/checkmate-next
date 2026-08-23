@@ -5,6 +5,7 @@ import '../../app/providers/settings.dart';
 import '../../app/theme/board_theme.dart';
 import '../../core/audio/sound_service.dart';
 import '../../core/l10n/strings.dart';
+import '../../core/utils/age_group.dart';
 import '../../core/storage/app_storage.dart';
 import '../board/piece_set.dart';
 
@@ -33,6 +34,34 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 RadioListTile<String>(value: 'tr', title: Text('Türkçe')),
                 RadioListTile<String>(value: 'en', title: Text('English')),
+              ],
+            ),
+          ),
+          const Divider(),
+          _SectionHeader(s.ageGroup),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text(
+              s.ageGroupHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                for (final group in AgeGroup.values)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _AgeTile(
+                      group: group,
+                      selected: group == settings.ageGroup,
+                      turkish: settings.turkish,
+                      onTap: () => controller.setAgeGroup(group),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -234,6 +263,78 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AgeTile extends StatelessWidget {
+  const _AgeTile({
+    required this.group,
+    required this.selected,
+    required this.turkish,
+    required this.onTap,
+  });
+
+  final AgeGroup group;
+  final bool selected;
+  final bool turkish;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Material(
+      color: selected ? scheme.primaryContainer : scheme.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected
+                  ? scheme.primary
+                  : scheme.outlineVariant.withValues(alpha: 0.6),
+              width: selected ? 1.6 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                selected ? Icons.check_circle : Icons.circle_outlined,
+                size: 20,
+                color: selected ? scheme.primary : scheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      group.label(turkish),
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: selected
+                            ? scheme.onPrimaryContainer
+                            : scheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      group.range(turkish),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

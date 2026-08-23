@@ -1,7 +1,13 @@
 import 'package:dartchess/dartchess.dart';
 import 'package:flutter/material.dart';
 
-/// Taş takımının renk şeması.
+/// Taşların çizim ailesi.
+///
+/// Renk değil biçim farkıdır: [classic] Staunton silüetini izler, [playful]
+/// daha tombul ve yuvarlak hatlıdır. Küçük yaş grubunda ikincisi kullanılır.
+enum PieceShape { classic, playful }
+
+/// Taş takımının renk şeması ve biçimi.
 class PieceSet {
   final String id;
   final String trName;
@@ -12,6 +18,7 @@ class PieceSet {
   final Color blackFill;
   final Color blackStroke;
   final Color blackDetail;
+  final PieceShape shape;
 
   const PieceSet({
     required this.id,
@@ -23,6 +30,7 @@ class PieceSet {
     required this.blackFill,
     required this.blackStroke,
     required this.blackDetail,
+    this.shape = PieceShape.classic,
   });
 
   String label(bool turkish) => turkish ? trName : enName;
@@ -63,7 +71,21 @@ class PieceSet {
     blackDetail: Color(0xFFDCE8F4),
   );
 
-  static const all = <PieceSet>[classic, wood, cobalt];
+  /// Küçük yaş grubu için: tombul biçimler, yüksek doygunluklu renkler.
+  static const playful = PieceSet(
+    id: 'playful',
+    trName: 'Neşeli',
+    enName: 'Playful',
+    shape: PieceShape.playful,
+    whiteFill: Color(0xFFFFF3D6),
+    whiteStroke: Color(0xFFB4741E),
+    whiteDetail: Color(0xFFB4741E),
+    blackFill: Color(0xFF3E5C9A),
+    blackStroke: Color(0xFF1F3260),
+    blackDetail: Color(0xFFFFF3D6),
+  );
+
+  static const all = <PieceSet>[classic, wood, cobalt, playful];
 
   static PieceSet fromId(String? id) =>
       all.firstWhere((s) => s.id == id, orElse: () => classic);

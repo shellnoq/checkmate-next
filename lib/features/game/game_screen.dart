@@ -190,6 +190,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => _ResultSheet(
         result: result,
+        celebrationParticles: settings.ageGroup.celebrationParticles,
         turkish: settings.turkish,
         localSide: widget.config.kind == MatchKind.engine
             ? widget.config.localSide
@@ -667,6 +668,7 @@ class _ActionButton extends StatelessWidget {
 class _ResultSheet extends StatefulWidget {
   const _ResultSheet({
     required this.result,
+    required this.celebrationParticles,
     required this.turkish,
     required this.localSide,
     required this.strings,
@@ -676,6 +678,10 @@ class _ResultSheet extends StatefulWidget {
   });
 
   final GameResult result;
+
+  /// Sıfırsa kutlama yalnızca simge animasyonuyla sınırlı kalır.
+  final int celebrationParticles;
+
   final bool turkish;
   final Side? localSide;
   final S strings;
@@ -745,7 +751,12 @@ class _ResultSheetState extends State<_ResultSheet>
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    if (won) const Positioned.fill(child: VictoryBurst()),
+                    if (won && widget.celebrationParticles > 0)
+                      Positioned.fill(
+                        child: VictoryBurst(
+                          particleCount: widget.celebrationParticles,
+                        ),
+                      ),
                     ScaleTransition(
                       scale: CurvedAnimation(
                         parent: _intro,

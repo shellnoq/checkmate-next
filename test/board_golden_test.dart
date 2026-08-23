@@ -77,6 +77,26 @@ void main() {
     );
   });
 
+  testWidgets('neşeli takım — küçük yaş grubu görünümü', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(440, 440));
+    await tester.pumpWidget(
+      wrap(
+        ChessBoard(
+          position: Chess.initial,
+          orientation: Side.white,
+          boardTheme: BoardTheme.tournament,
+          pieceSet: PieceSet.playful,
+          interactive: false,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byType(ChessBoard),
+      matchesGoldenFile('goldens/board_playful.png'),
+    );
+  });
+
   testWidgets('siyah yönünde tahta — kobalt takım, şah vurgusu', (
     tester,
   ) async {

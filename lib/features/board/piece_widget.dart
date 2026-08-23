@@ -29,9 +29,12 @@ class PieceWidget extends StatelessWidget {
         width: size,
         height: size,
         child: Padding(
-          // Taşlar kare kenarına yapışmasın; klasik takımlarda da benzer bir
-          // pay bırakılır.
-          padding: EdgeInsets.all(size * 0.04),
+          // Klasik takımda kare kenarına bir pay bırakılır. Neşeli takım
+          // kareyi daha çok doldurur; küçük yaş grubunda taşların iri
+          // görünmesi hem daha çekici hem dokunması daha kolay.
+          padding: EdgeInsets.all(
+            size * (pieceSet.shape == PieceShape.playful ? 0.005 : 0.04),
+          ),
           child: SvgPicture.string(svg, fit: BoxFit.contain),
         ),
       ),

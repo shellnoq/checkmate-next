@@ -3,7 +3,7 @@ description: "CheckMate Next — Stockfish destekli profesyonel satranç uygulam
 publish_to: 'none'
 
 # versionName+versionCode. Play Store yüklemesinde versionCode her zaman artmalıdır.
-version: 1.0.2+4
+version: 1.1.0+5
 
 environment:
   sdk: ^3.11.0

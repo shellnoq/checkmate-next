@@ -24,21 +24,91 @@ class PieceSvg {
     final stroke = _hex(set.strokeOf(piece.color));
     final detail = _hex(set.detailOf(piece.color));
 
-    final body = switch (piece.role) {
-      Role.pawn => _pawn(detail),
-      Role.rook => _rook(detail),
-      Role.knight => _knight(detail),
-      Role.bishop => _bishop(detail),
-      Role.queen => _queen(detail),
-      Role.king => _king(detail),
+    final body = switch (set.shape) {
+      PieceShape.classic => switch (piece.role) {
+        Role.pawn => _pawn(detail),
+        Role.rook => _rook(detail),
+        Role.knight => _knight(detail),
+        Role.bishop => _bishop(detail),
+        Role.queen => _queen(detail),
+        Role.king => _king(detail),
+      },
+      PieceShape.playful => switch (piece.role) {
+        Role.pawn => _playfulPawn(detail),
+        Role.rook => _playfulRook(detail),
+        Role.knight => _playfulKnight(detail),
+        Role.bishop => _playfulBishop(detail),
+        Role.queen => _playfulQueen(detail),
+        Role.king => _playfulKing(detail),
+      },
     };
 
+    // Neşeli takımda daha kalın kontur: küçük ekranlarda ve küçük yaş
+    // grubunda taşlar birbirinden daha kolay ayrılır.
+    final strokeWidth = set.shape == PieceShape.playful ? 2.0 : 1.5;
+
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45">'
-        '<g fill="$fill" stroke="$stroke" stroke-width="1.5" '
+        '<g fill="$fill" stroke="$stroke" stroke-width="$strokeWidth" '
         'stroke-linejoin="round" stroke-linecap="round">'
         '$body'
         '</g></svg>';
   }
+
+  // ── Neşeli takım: tombul gövdeler, yuvarlak hatlar, kalın kontur ──
+
+  static const _pBase =
+      '<rect x="7.6" y="36.8" width="29.8" height="6.2" rx="3.1"/>';
+
+  static const _pSkirt =
+      '<path d="M14 28.4h17c.9 4.6 2.7 7 4.6 8.6H9.4'
+      'c1.9-1.6 3.7-4 4.6-8.6z"/>';
+
+  static const _pPedestal = '$_pSkirt$_pBase';
+
+  static String _playfulPawn(String detail) =>
+      '<circle cx="22.5" cy="13.2" r="6.4"/>'
+      '<path d="M16.7 19.1c1.7 1.4 3.6 2.1 5.8 2.1s4.1-.7 5.8-2.1'
+      'c2 2.2 3.2 5.2 3.2 8.5 0 .6 0 1.2-.1 1.8H13.6c-.1-.6-.1-1.2-.1-1.8 '
+      '0-3.3 1.2-6.3 3.2-8.5z"/>'
+      '$_pPedestal';
+
+  static String _playfulRook(String detail) =>
+      '<path d="M10.6 8h5.6v3.8h4.1V8h4.4v3.8h4.1V8h5.6v10.4l-3.2 2.6v8.4'
+      'H13.8v-8.4l-3.2-2.6z"/>'
+      '<path d="M15 23.6h15" stroke="$detail" stroke-width="1.6" '
+      'fill="none"/>'
+      '$_pPedestal';
+
+  static String _playfulKnight(String detail) =>
+      '<path d="M21.4 9.6c3.2-2.2 6.6-1.4 8.3 1.1l1-2.6 2.3 3.6'
+      'c2 3.2 2.7 7.2 2.2 11.4-.3 2.4-.8 4.3-1.2 5.7H15.1'
+      'c-.5-3.6.5-6.7 2.5-9.2l-4.4 2.4c-2-1.6-2.2-4-.6-6l5.4-5.2'
+      'c1-1 2.1-1.7 3.4-2.2z"/>'
+      '<circle cx="20.6" cy="16" r="2" fill="$detail" stroke="none"/>'
+      '<circle cx="14.6" cy="20.4" r="1.1" fill="$detail" stroke="none"/>'
+      '$_pPedestal';
+
+  static String _playfulBishop(String detail) =>
+      '<circle cx="22.5" cy="6.8" r="2.9"/>'
+      '<path d="M22.5 9.8c4.6 3.9 7.5 8 7.5 11.9 0 4.2-3.4 7.1-7.5 7.1'
+      's-7.5-2.9-7.5-7.1c0-3.9 2.9-8 7.5-11.9z"/>'
+      '<circle cx="22.5" cy="18.6" r="2.3" fill="$detail" stroke="none"/>'
+      '$_pPedestal';
+
+  static String _playfulQueen(String detail) =>
+      '<circle cx="10.6" cy="13" r="3.1"/>'
+      '<circle cx="22.5" cy="9.2" r="3.5"/>'
+      '<circle cx="34.4" cy="13" r="3.1"/>'
+      '<path d="M10.6 15.4l3 13h17.8l3-13-6 5.2-5.9-7.6-5.9 7.6z"/>'
+      '$_pPedestal';
+
+  static String _playfulKing(String detail) =>
+      '<path d="M20.5 3.2h4v3.6h3.6v4h-3.6v4h-4v-4h-3.6v-4h3.6z"/>'
+      '<path d="M22.5 15c-6.1 0-11 4.5-11 10.2 0 1.2.2 2.3.5 3.4h21'
+      'c.3-1.1.5-2.2.5-3.4 0-5.7-4.9-10.2-11-10.2z"/>'
+      '<path d="M13.4 23.4h18.2" stroke="$detail" stroke-width="1.6" '
+      'fill="none"/>'
+      '$_pPedestal';
 
   // ── Ortak parçalar ──
 

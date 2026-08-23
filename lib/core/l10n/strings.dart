@@ -83,6 +83,13 @@ class S {
 
   // Ayarlar
   String get language => _('Dil', 'Language');
+  String get ageGroup => _('Yaş grubu', 'Age group');
+  String get ageGroupHint => _(
+    'Taş takımını ve kutlama yoğunluğunu belirler. Kuralları ve zorluğu '
+        'değiştirmez.',
+    'Sets the piece style and how lively the celebrations are. It does not '
+        'change the rules or the difficulty.',
+  );
   String get boardTheme => _('Tahta Teması', 'Board Theme');
   String get pieceSet => _('Taş Takımı', 'Piece Set');
   String get sound => _('Ses', 'Sound');

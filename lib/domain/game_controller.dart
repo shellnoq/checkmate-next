@@ -39,6 +39,10 @@ class GameController extends ChangeNotifier {
   final bool analysisEnabled;
   final ChessClock clock;
 
+  /// Ekranda geçen süre. Satranç saatinden ayrıdır: süresiz oyunda da işler ve
+  /// uygulama arka plana alındığında durur. Ebeveyn bölümü bunu kullanır.
+  final Stopwatch _playClock = Stopwatch();
+
   /// Hamle uygulandığında (yerel ya da rakip) çağrılır. Ses ve titreşim
   /// geri bildirimi için sunum katmanı bağlar.
   ValueChanged<MoveRecord>? onMoveApplied;
@@ -170,9 +174,21 @@ class GameController extends ChangeNotifier {
 
   // ── Yaşam döngüsü ──
 
+  /// Oyunun başından beri ekranda geçen süre.
+  Duration get playedTime => _playClock.elapsed;
+
+  /// Uygulama arka plana alındığında sayaç durur.
+  void pausePlayClock() => _playClock.stop();
+
+  /// Öne dönüldüğünde, oyun sürüyorsa sayaç devam eder.
+  void resumePlayClock() {
+    if (_phase == GamePhase.playing) _playClock.start();
+  }
+
   Future<void> start() async {
     _eventSub = _transport.events.listen(_onMatchEvent);
     _phase = GamePhase.playing;
+    _playClock.start();
     _refreshLegalDests();
     notifyListeners();
     try {
@@ -382,6 +398,9 @@ class GameController extends ChangeNotifier {
   }
 
   Future<void> rematch() async {
+    _playClock
+      ..reset()
+      ..start();
     _moves.clear();
     _repetitions.clear();
     _position = _positionFromFen(config.startingFen);
@@ -530,6 +549,7 @@ class GameController extends ChangeNotifier {
   void _finish(GameResult result) {
     if (_phase == GamePhase.finished) return;
     _phase = GamePhase.finished;
+    _playClock.stop();
     _result = result;
     _selected = null;
     _pendingPromotion = null;

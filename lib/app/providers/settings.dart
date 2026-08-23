@@ -25,6 +25,9 @@ class AppSettings {
   final TimeControl lastTimeControl;
   final AgeGroup ageGroup;
 
+  /// Günlük oyun süresi sınırı. `Duration.zero` ise sınır yoktur.
+  final Duration dailyLimit;
+
   const AppSettings({
     required this.locale,
     required this.themeMode,
@@ -39,6 +42,7 @@ class AppSettings {
     required this.lastDifficulty,
     required this.lastTimeControl,
     required this.ageGroup,
+    required this.dailyLimit,
   });
 
   bool get turkish => locale.languageCode == 'tr';
@@ -57,6 +61,7 @@ class AppSettings {
     DifficultyLevel? lastDifficulty,
     TimeControl? lastTimeControl,
     AgeGroup? ageGroup,
+    Duration? dailyLimit,
   }) => AppSettings(
     locale: locale ?? this.locale,
     themeMode: themeMode ?? this.themeMode,
@@ -71,6 +76,7 @@ class AppSettings {
     lastDifficulty: lastDifficulty ?? this.lastDifficulty,
     lastTimeControl: lastTimeControl ?? this.lastTimeControl,
     ageGroup: ageGroup ?? this.ageGroup,
+    dailyLimit: dailyLimit ?? this.dailyLimit,
   );
 
   static AppSettings load() => AppSettings(
@@ -97,6 +103,7 @@ class AppSettings {
       AppStorage.get<String>('timeControl', 'rapid10'),
     ),
     ageGroup: AgeGroup.fromId(AppStorage.get<String>('ageGroup', 'adult')),
+    dailyLimit: Duration(minutes: AppStorage.get<int>('dailyLimitMinutes', 0)),
   );
 }
 
@@ -159,6 +166,12 @@ class SettingsController extends StateNotifier<AppSettings> {
     state = state.copyWith(ageGroup: group, pieceSet: group.suggestedPieceSet);
     await AppStorage.set('ageGroup', group.id);
     await AppStorage.set('pieceSet', group.suggestedPieceSet.id);
+  }
+
+  /// Günlük süre sınırını ayarlar. Sıfır dakika sınırı kaldırır.
+  Future<void> setDailyLimit(Duration limit) async {
+    state = state.copyWith(dailyLimit: limit);
+    await AppStorage.set('dailyLimitMinutes', limit.inMinutes);
   }
 
   Future<void> rememberSetup(

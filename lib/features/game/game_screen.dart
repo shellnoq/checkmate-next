@@ -29,16 +29,52 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen>
+    with WidgetsBindingObserver {
   GameController? _controller;
   Object? _startupError;
   bool _boardFlipped = false;
   bool _resultShown = false;
 
+  /// Depoya şimdiye kadar yazılmış oynama süresi. Fark hesaplayarak yazmak,
+  /// aynı sürenin iki kez sayılmasını önler.
+  Duration _flushedPlaytime = Duration.zero;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final controller = _controller;
+    if (controller == null) return;
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        controller.pausePlayClock();
+        _flushPlaytime();
+      case AppLifecycleState.resumed:
+        controller.resumePlayClock();
+    }
+  }
+
+  /// Oyunda geçen süreyi depoya işler. Ebeveyn bölümü bu veriyi okur.
+  void _flushPlaytime() {
+    final controller = _controller;
+    if (controller == null) return;
+    final total = controller.playedTime;
+    final delta = total - _flushedPlaytime;
+    if (delta <= Duration.zero) return;
+    _flushedPlaytime = total;
+    AppStorage.addPlaytime(
+      widget.config.difficulty?.id ?? widget.config.kind.name,
+      delta,
+    );
   }
 
   Future<void> _bootstrap() async {
@@ -106,6 +142,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _onGameEnded(GameResult result) {
+    _flushPlaytime();
     _persistResult(result);
     final localWon =
         result.winner != null &&
@@ -199,6 +236,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         onRematch: () {
           Navigator.of(context).pop();
           _resultShown = false;
+          // Yeni oyunun süresi sıfırdan sayılır; önceki oyunun süresi zaten
+          // oyun bitiminde işlenmişti.
+          _flushedPlaytime = Duration.zero;
           controller.rematch();
         },
         onNewGame: () {
@@ -244,6 +284,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   void dispose() {
+    _flushPlaytime();
+    WidgetsBinding.instance.removeObserver(this);
     _controller?.removeListener(_onControllerChanged);
     _controller?.dispose();
     super.dispose();

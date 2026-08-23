@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers/settings.dart';
 import '../../core/l10n/strings.dart';
+import '../../core/storage/app_storage.dart';
 import '../../domain/match/match_protocol.dart';
 import '../../domain/model/difficulty.dart';
 import '../../domain/model/time_control.dart';
@@ -38,7 +39,37 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
 
   bool get _vsEngine => widget.kind == MatchKind.engine;
 
+  /// Günlük sınır dolduysa yeni oyuna izin verilmez. Süren bir oyun asla
+  /// yarıda kesilmez; sınır yalnızca başlangıcı engeller.
+  bool _dailyLimitReached() {
+    final limit = ref.read(settingsProvider).dailyLimit;
+    if (limit <= Duration.zero) return false;
+    return AppStorage.playtimeOfDay(DateTime.now()) >= limit;
+  }
+
+  Future<void> _showLimitReached() async {
+    final s = S.of(context);
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.hourglass_bottom),
+        title: Text(s.limitReached),
+        content: Text(s.limitReachedHint),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(s.ok),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _start() {
+    if (_dailyLimitReached()) {
+      _showLimitReached();
+      return;
+    }
     final settings = ref.read(settingsProvider);
     ref
         .read(settingsProvider.notifier)

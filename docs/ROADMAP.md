@@ -42,28 +42,24 @@ GPL-3.0 olduğu için o da değişmelidir.
 
 ## Sıradaki özellikler
 
-Kapalı testin 14 günü boyunca geliştirilecekler. Öncelik sırası henüz
-belirlenmedi.
+### Online oyun
+Sırada bekleyen tek büyük iş.
 
-### Taş ve tahta animasyonları
-Hamle animasyonu bugün var (taş kimliği izlenerek kaydırma). Eklenecekler:
-taş alındığında kısa bir efekt, şah çekildiğinde tahtanın tepki vermesi,
-oyun sonunda kutlama. Amaç görsel çekiciliği artırmak, özellikle genç
-oyuncular için.
+## Tamamlananlar
 
-### Yaşa göre görsel zenginlik
-Küçük yaş grubunda daha büyük, daha renkli ve daha "canlı" taşlar; ileri
-yaşta bugünkü sade takım. Taş takımı altyapısı (`PieceSet` + `PieceSvg`)
-buna hazır: yeni bir takım tanımlamak renk ve şekil verisi eklemekten ibaret.
+### Taş ve tahta animasyonları — yapıldı
+Taş alma solması, şah vuruşu, galibiyet patlaması; ayrıca her hamlede görünen
+seçim kalkması, hamle noktalarının sırayla açılması, son hamle vurgusunun
+yumuşak belirmesi ve tahta açılışındaki sıralı yerleşme.
 
-### Ebeveyn kontrolü
-Ebeveynin görebileceği bir bölüm: çocuğun hangi zorluk kademesinde ne kadar
-süre oynadığı, kaç oyun bitirdiği, galibiyet dağılımı. Oturum süresi sınırı
-koyabilme. Bölüme PIN ile giriş.
+### Ebeveyn kontrolü — yapıldı
+Ayarlar → Ebeveyn Bölümü. PIN ile açılır; bugünkü ve toplam oynama süresi,
+kademe başına süre dökümü, son yedi günün grafiği ve günlük süre sınırı
+bulunur. Sınır dolduğunda yeni oyun başlatılamaz, süren oyun kesilmez.
 
-Veri altyapısı kısmen hazır: oyunlar `AppStorage.archiveGame` ile arşivleniyor
-ve kademe bazlı galibiyet sayacı tutuluyor. Eksik olan oynama süresi ölçümü ve
-ebeveyn arayüzü.
+### Yaşa göre görsel zenginlik — yapıldı
+Ayarlar → Yaş grubu. Küçük yaşta neşeli takım ve coşkulu kutlama, yetişkinde
+sade görünüm. Kurallar ve zorluk kademeleri değişmez.
 
 ### Online oyun
 Mimari hazır, ayrıntısı `docs/ONLINE.md` dosyasında. Sunucu tarafı yazıldığında

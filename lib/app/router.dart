@@ -4,6 +4,7 @@ import '../domain/match/match_protocol.dart';
 import '../features/game/game_screen.dart';
 import '../features/history/archive_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/parent/parent_area_screen.dart';
 import '../features/play/new_game_screen.dart';
 import '../features/settings/settings_screen.dart';
 
@@ -27,6 +28,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/archive',
       builder: (context, state) => const ArchiveScreen(),
+    ),
+    GoRoute(
+      path: '/parent',
+      builder: (context, state) => const ParentAreaScreen(),
     ),
     GoRoute(
       path: '/settings',

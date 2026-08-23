@@ -102,6 +102,41 @@ class S {
   String get about => _('Hakkında', 'About');
   String get resetStats => _('İstatistikleri sıfırla', 'Reset statistics');
 
+  // Ebeveyn bölümü
+  String get parentArea => _('Ebeveyn Bölümü', 'Parent Area');
+  String get parentAreaSub =>
+      _('Oynama süresi ve günlük sınır', 'Time played and daily limit');
+  String get pinCreate => _('Bir PIN belirleyin', 'Choose a PIN');
+  String get pinCreateHint => _(
+    'Bu bölüme yalnızca siz girebilesiniz diye dört haneli bir sayı seçin.',
+    'Pick a four-digit number so only you can open this section.',
+  );
+  String get pinEnter => _('PIN girin', 'Enter your PIN');
+  String get pinEnterHint =>
+      _('Ebeveyn bölümüne girmek için', 'To open the parent area');
+  String get pinSave => _('Kaydet', 'Save');
+  String get pinUnlock => _('Aç', 'Unlock');
+  String get pinFourDigits => _('Dört hane girin', 'Enter four digits');
+  String get pinWrong => _('PIN yanlış', 'Wrong PIN');
+  String get dailyLimit => _('Günlük süre sınırı', 'Daily time limit');
+  String get dailyLimitHint => _(
+    'Sınır dolduğunda yeni oyun başlatılamaz. Süren oyun yarıda kesilmez.',
+    'When the limit is reached no new game can be started. A game in '
+        'progress is never interrupted.',
+  );
+  String get noLimit => _('Sınırsız', 'No limit');
+  String get minutesShort => _('dk', 'min');
+  String get timePerLevel => _('Kademeye göre süre', 'Time per level');
+  String get lastSevenDays => _('Son 7 gün', 'Last 7 days');
+  String get today => _('Bugün', 'Today');
+  String get overall => _('Toplam', 'Overall');
+  String get limitReached =>
+      _('Bugünlük oyun süresi doldu', 'Time is up for today');
+  String get limitReachedHint => _(
+    'Günlük sınıra ulaşıldı. Yarın yeniden oynayabilirsin.',
+    'The daily limit has been reached. You can play again tomorrow.',
+  );
+
   // İstatistik
   String get wins => _('Galibiyet', 'Wins');
   String get losses => _('Mağlubiyet', 'Losses');

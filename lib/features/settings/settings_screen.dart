@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/providers/settings.dart';
 import '../../app/theme/board_theme.dart';
@@ -37,6 +38,14 @@ class SettingsScreen extends ConsumerWidget {
                 RadioListTile<String>(value: 'en', title: Text('English')),
               ],
             ),
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.family_restroom),
+            title: Text(s.parentArea),
+            subtitle: Text(s.parentAreaSub),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/parent'),
           ),
           const Divider(),
           _SectionHeader(s.ageGroup),

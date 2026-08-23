@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:dartchess/dartchess.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +15,16 @@ class _TrackedPiece {
   final int id;
   final Piece piece;
   Square square;
+}
+
+/// Tahtadan kalkan bir taş. Alınan taş anında yok olmaz; kısa bir büyüyüp
+/// solma animasyonuyla çıkar, böylece hamlenin ne olduğu gözden kaçmaz.
+class _CapturedPiece {
+  _CapturedPiece(this.id, this.piece, this.square);
+
+  final int id;
+  final Piece piece;
+  final Square square;
 }
 
 /// Etkileşimli satranç tahtası.
@@ -63,19 +75,41 @@ class ChessBoard extends StatefulWidget {
   State<ChessBoard> createState() => _ChessBoardState();
 }
 
-class _ChessBoardState extends State<ChessBoard> {
+class _ChessBoardState extends State<ChessBoard>
+    with SingleTickerProviderStateMixin {
   static const _animationDuration = Duration(milliseconds: 180);
+  static const _captureDuration = Duration(milliseconds: 260);
 
   final List<_TrackedPiece> _tracked = [];
+
+  /// Solmakta olan, tahtadan kalkmış taşlar.
+  final List<_CapturedPiece> _captured = [];
+
   int _nextId = 0;
 
   Square? _dragFrom;
   Offset? _dragPosition;
 
+  /// Şah çekildiği anda oynatılan sönümlü çift vuruş. Sürekli yanıp sönmek
+  /// uzun düşünme sürelerinde rahatsız edici olacağından animasyon biter ve
+  /// geriye sabit kırmızı vurgu kalır.
+  late final AnimationController _checkPulse;
+
   @override
   void initState() {
     super.initState();
+    _checkPulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 820),
+    );
     _syncPieces(widget.position, animate: false);
+    if (widget.checkedSquare != null) _checkPulse.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _checkPulse.dispose();
+    super.dispose();
   }
 
   @override
@@ -83,6 +117,12 @@ class _ChessBoardState extends State<ChessBoard> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.position.fen != widget.position.fen) {
       _syncPieces(widget.position, animate: true);
+    }
+    final square = widget.checkedSquare;
+    if (square != null && square != oldWidget.checkedSquare) {
+      _checkPulse.forward(from: 0);
+    } else if (square == null) {
+      _checkPulse.value = 0;
     }
   }
 
@@ -133,12 +173,20 @@ class _ChessBoardState extends State<ChessBoard> {
       remaining.add(_TrackedPiece(_nextId++, entry.value, entry.key));
     }
 
+    // 4) Hiçbir hedefe denk gelmeyenler tahtadan kalkmıştır: alınan taş,
+    //    geçerken alınan piyon ya da terfi eden piyonun kendisi. Tek bir
+    //    hamlede en çok bir taş kalkabileceği için, daha fazlası bir hamle
+    //    değil kurulum değişikliğidir (yeni oyun, geri alma) ve animasyonsuz
+    //    geçilir.
+    if (animate && leftovers.isNotEmpty && leftovers.length <= 2) {
+      for (final gone in leftovers) {
+        _captured.add(_CapturedPiece(_nextId++, gone.piece, gone.square));
+      }
+    }
+
     _tracked
       ..clear()
       ..addAll(remaining);
-    if (!animate) {
-      // İlk kurulumda animasyon istenmiyor; durum zaten yeni kurulmuş olur.
-    }
   }
 
   /// Ekran koordinatını kareye çevirir.
@@ -225,6 +273,7 @@ class _ChessBoardState extends State<ChessBoard> {
               children: [
                 _buildSquares(squareSize),
                 if (widget.showLegalMoves) _buildDestinations(squareSize),
+                ..._buildCaptured(squareSize),
                 ..._buildPieces(squareSize),
                 if (widget.hintMove != null) _buildHint(squareSize),
                 if (_dragFrom != null && _dragPosition != null)
@@ -261,8 +310,10 @@ class _ChessBoardState extends State<ChessBoard> {
     final isLight = (square.file + square.rank).isEven;
     final baseColor = isLight ? theme.light : theme.dark;
 
+    final isChecked = widget.checkedSquare == square;
+
     Color? overlay;
-    if (widget.checkedSquare == square) {
+    if (isChecked) {
       overlay = theme.check;
     } else if (widget.selectedSquare == square) {
       overlay = theme.selection;
@@ -283,6 +334,29 @@ class _ChessBoardState extends State<ChessBoard> {
           Positioned.fill(child: ColoredBox(color: baseColor)),
           if (overlay != null)
             Positioned.fill(child: ColoredBox(color: overlay)),
+          if (isChecked)
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: _checkPulse,
+                builder: (context, _) {
+                  final t = _checkPulse.value;
+                  // İki vuruşluk, giderek sönen bir parlama.
+                  final beat = math.sin(t * math.pi * 4).abs();
+                  final strength = beat * (1 - t) * (1 - t);
+                  if (strength <= 0.01) return const SizedBox.shrink();
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        colors: [
+                          theme.check.withValues(alpha: strength),
+                          theme.check.withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           if (widget.showCoordinates && col == 0)
             Positioned(
               left: size * 0.06,
@@ -376,6 +450,40 @@ class _ChessBoardState extends State<ChessBoard> {
               size: squareSize,
               pieceSet: widget.pieceSet,
               opacity: _dragFrom == tracked.square ? 0.28 : 1.0,
+            ),
+          ),
+        ),
+    ];
+  }
+
+  /// Kalkan taşları büyüterek soldurur, bitince listeden düşürür.
+  List<Widget> _buildCaptured(double squareSize) {
+    return [
+      for (final gone in _captured)
+        Positioned(
+          key: ValueKey('captured_${gone.id}'),
+          left: _cellOfSquare(gone.square).$2 * squareSize,
+          top: _cellOfSquare(gone.square).$1 * squareSize,
+          width: squareSize,
+          height: squareSize,
+          child: IgnorePointer(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: _captureDuration,
+              curve: Curves.easeOut,
+              onEnd: () {
+                if (!mounted) return;
+                setState(() => _captured.remove(gone));
+              },
+              builder: (context, t, child) => Opacity(
+                opacity: (1 - t).clamp(0.0, 1.0),
+                child: Transform.scale(scale: 1 + t * 0.45, child: child),
+              ),
+              child: PieceWidget(
+                piece: gone.piece,
+                size: squareSize,
+                pieceSet: widget.pieceSet,
+              ),
             ),
           ),
         ),

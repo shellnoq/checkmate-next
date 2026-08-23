@@ -18,6 +18,7 @@ import 'widgets/evaluation_bar.dart';
 import 'widgets/move_table.dart';
 import 'widgets/player_bar.dart';
 import 'widgets/promotion_sheet.dart';
+import 'widgets/victory_burst.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key, required this.config});
@@ -663,7 +664,7 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-class _ResultSheet extends StatelessWidget {
+class _ResultSheet extends StatefulWidget {
   const _ResultSheet({
     required this.result,
     required this.turkish,
@@ -683,7 +684,34 @@ class _ResultSheet extends StatelessWidget {
   final VoidCallback onCopyPgn;
 
   @override
+  State<_ResultSheet> createState() => _ResultSheetState();
+}
+
+class _ResultSheetState extends State<_ResultSheet>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _intro;
+
+  @override
+  void initState() {
+    super.initState();
+    _intro = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 620),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _intro.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final result = widget.result;
+    final localSide = widget.localSide;
+    final turkish = widget.turkish;
+    final strings = widget.strings;
     final theme = Theme.of(context);
     final won = localSide != null && result.winner == localSide;
     final accent = result.isDraw
@@ -711,16 +739,32 @@ class _ResultSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Icon(
-                result.isDraw
-                    ? Icons.handshake_outlined
-                    : won
-                    ? Icons.emoji_events_outlined
-                    : Icons.sentiment_dissatisfied_outlined,
-                size: 44,
-                color: accent,
+              SizedBox(
+                height: 68,
+                width: double.infinity,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (won) const Positioned.fill(child: VictoryBurst()),
+                    ScaleTransition(
+                      scale: CurvedAnimation(
+                        parent: _intro,
+                        curve: Curves.elasticOut,
+                      ),
+                      child: Icon(
+                        result.isDraw
+                            ? Icons.handshake_outlined
+                            : won
+                            ? Icons.emoji_events_outlined
+                            : Icons.sentiment_dissatisfied_outlined,
+                        size: 44,
+                        color: accent,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 result.headline(turkish, localSide: localSide),
                 style: theme.textTheme.headlineSmall?.copyWith(
@@ -737,19 +781,19 @@ class _ResultSheet extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               FilledButton.icon(
-                onPressed: onRematch,
+                onPressed: widget.onRematch,
                 icon: const Icon(Icons.replay),
                 label: Text(strings.rematch),
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
-                onPressed: onNewGame,
+                onPressed: widget.onNewGame,
                 icon: const Icon(Icons.tune),
                 label: Text(strings.newGameShort),
               ),
               const SizedBox(height: 8),
               TextButton.icon(
-                onPressed: onCopyPgn,
+                onPressed: widget.onCopyPgn,
                 icon: const Icon(Icons.copy_all_outlined),
                 label: Text(strings.copyPgn),
               ),

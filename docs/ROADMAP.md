@@ -56,23 +56,13 @@ Kapalı testin ilk turundan üç kullanıcının istekleri; boyuta göre gruplan
   ekranı ve motorlu hamle kalitesi analizi (kitap/yıldız/tik/soru/çarpı).
   Canlı oyunda da açılış adı gösteriliyor.
 
-### Orta boy
-- **Ön hamle (premove):** sıra rakipteyken sonraki hamleyi çizip sıra gelince
-  otomatik oynatma.
-- **Bulmacalar:** N hamlede mat / kazanç. Veri seti bulunmalı ya da motorla
-  üretilmeli.
-- **Oyun sonu sözleri ve istatistik:** maç bitiminde satranç/zafer üzerine
-  rastgele özlü söz ve kısa istatistik. Söz havuzu metinle başlar,
-  seslendirme sonra.
-- **Başarımlar ve coin:** oyun sonunda performansa göre puan; temaların
-  kilidini açmakta kullanılacak.
+Tüm birikim tamamlandı: ön hamle, mat bulmacaları (çözücü doğrulamalı),
+oyun sonu sözleri ve istatistik, başarımlar + coin ekonomisi, dört tema
+paketi (arka plan + fon müziği), sesli açılış okulu (4 ders) ve beş sesli
+hikâye. Ayrıntılar depo geçmişinde.
 
-### Büyük
-- **Tema paketleri:** uzay, dinozor, antik Mısır/Yunan; tahta + taş + arka plan
-  + fon müziği birlikte; bir kısmı coin/başarımla açılır. Özel gün temaları.
-- **Açılış öğretmeni:** seviyeli ders sistemi, hamleleri açıklayan anlatıcı,
-  sesli yönlendirme. İçerik üretimi işin kendisinden büyük.
-- **Sesli satranç hikâyeleri:** çocuklara yönelik, altyazılı. İçerik ağırlıklı.
+Özel gün temaları ve ek ders/bulmaca/hikâye içeriği ileride aynı altyapıya
+eklenebilir; hepsi veri dosyasına satır eklemekten ibarettir.
 
 ## Sıradaki büyük işler
 

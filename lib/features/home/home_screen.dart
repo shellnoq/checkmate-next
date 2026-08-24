@@ -63,6 +63,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
+                          onPressed: () => context.push('/lessons'),
+                          icon: const Icon(Icons.school_outlined),
+                          label: Text(s.lessons),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
                           onPressed: () => context.push('/openings'),
                           icon: const Icon(Icons.auto_stories_outlined),
                           label: Text(s.openingLibrary),
@@ -96,6 +104,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           onPressed: () => context.push('/themes'),
                           icon: const Icon(Icons.palette_outlined),
                           label: Text(s.themePacks),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/stories'),
+                          icon: const Icon(Icons.menu_book_outlined),
+                          label: Text(s.stories),
                         ),
                       ),
                     ],

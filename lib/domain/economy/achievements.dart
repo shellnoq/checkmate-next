@@ -1,5 +1,6 @@
 import '../../core/storage/app_storage.dart';
 import '../model/difficulty.dart';
+import '../lessons/opening_lesson.dart';
 import '../puzzles/puzzle.dart';
 import 'coin_service.dart';
 
@@ -136,6 +137,28 @@ class AchievementService {
       coins: 40,
       isMet: () => PuzzleSet.all.every(
         (p) => AppStorage.statOf('puzzle_solved_${p.id}') > 0,
+      ),
+    ),
+    Achievement(
+      id: 'student',
+      trName: 'Öğrenci',
+      enName: 'Student',
+      trHint: 'Bir açılış dersini bitir',
+      enHint: 'Finish an opening lesson',
+      coins: 10,
+      isMet: () => LessonSet.all.any(
+        (l) => AppStorage.statOf('lesson_done_${l.id}') > 0,
+      ),
+    ),
+    Achievement(
+      id: 'graduate',
+      trName: 'Mezun',
+      enName: 'Graduate',
+      trHint: 'Tüm açılış derslerini bitir',
+      enHint: 'Finish every opening lesson',
+      coins: 30,
+      isMet: () => LessonSet.all.every(
+        (l) => AppStorage.statOf('lesson_done_${l.id}') > 0,
       ),
     ),
     Achievement(

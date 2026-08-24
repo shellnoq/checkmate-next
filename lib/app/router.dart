@@ -6,12 +6,16 @@ import '../features/game/game_screen.dart';
 import '../features/history/archive_screen.dart';
 import '../features/history/replay_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/lessons/lesson_screen.dart';
+import '../features/lessons/lessons_screen.dart';
 import '../features/openings/openings_screen.dart';
 import '../features/parent/parent_area_screen.dart';
 import '../features/puzzles/puzzle_play_screen.dart';
 import '../features/puzzles/puzzles_screen.dart';
 import '../features/play/new_game_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/stories/stories_screen.dart';
+import '../features/stories/story_screen.dart';
 import '../features/themes/themes_screen.dart';
 
 final appRouter = GoRouter(
@@ -45,6 +49,15 @@ final appRouter = GoRouter(
       builder: (context, state) => const OpeningsScreen(),
     ),
     GoRoute(
+      path: '/lessons',
+      builder: (context, state) => const LessonsScreen(),
+    ),
+    GoRoute(
+      path: '/lesson',
+      builder: (context, state) =>
+          LessonScreen(lessonId: state.extra! as String),
+    ),
+    GoRoute(
       path: '/achievements',
       builder: (context, state) => const AchievementsScreen(),
     ),
@@ -60,6 +73,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/parent',
       builder: (context, state) => const ParentAreaScreen(),
+    ),
+    GoRoute(
+      path: '/stories',
+      builder: (context, state) => const StoriesScreen(),
+    ),
+    GoRoute(
+      path: '/story',
+      builder: (context, state) => StoryScreen(storyId: state.extra! as String),
     ),
     GoRoute(path: '/themes', builder: (context, state) => const ThemesScreen()),
     GoRoute(

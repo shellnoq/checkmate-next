@@ -118,6 +118,22 @@ class S {
   String get categoryClosed => _('Kapalı Oyunlar', 'Closed Games');
   String get categoryFlank => _('Kanat Açılışları', 'Flank Openings');
 
+  // Hikâyeler
+  String get stories => _('Hikâyeler', 'Stories');
+  String get storyListen => _('Dinle', 'Listen');
+  String get storyStop => _('Durdur', 'Stop');
+
+  // Dersler
+  String get lessons => _('Açılış Okulu', 'Opening School');
+  String get lessonYourTurn => _('Sıra sende, göster kendini', 'Your move');
+  String get lessonWrong => _(
+    'Olmadı; ipucu okuna bak ve yeniden dene',
+    'Not quite; follow the hint arrow and try again',
+  );
+  String get lessonDone => _('Ders tamamlandı', 'Lesson complete');
+  String get teacherVoice => _('Öğretmen sesi', 'Teacher voice');
+  String get completedTag => _('Tamamlandı', 'Completed');
+
   // Tema paketleri
   String get themePacks => _('Tema Paketleri', 'Theme Packs');
   String get owned => _('Sahipsin', 'Owned');

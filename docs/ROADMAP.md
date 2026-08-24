@@ -40,10 +40,50 @@ izin verici lisanslı bir gerçeklemeyle değiştirilmesi gerekir; `ChessEngine`
 arayüzü bu değişimi tek dosyaya indirger, ama `dartchess` kural katmanı da
 GPL-3.0 olduğu için o da değişmelidir.
 
-## Sıradaki özellikler
+## Test geri bildirimi birikimi (24 Ağustos 2026)
+
+Kapalı testin ilk turundan üç kullanıcının istekleri; boyuta göre gruplandı.
+
+### Yapıldı
+- Hamlesiz terk edilen oyun artık ne mağlubiyet sayılıyor ne arşivde
+  görünüyor.
+- Saat oyun başında 3 saniye bekliyor; ilk hamle daha erken gelirse o anda
+  başlıyor.
+- Sürükle-bırak zaten vardı (taşa basılı tutup kaydırınca taşınıyor); kırık
+  görünen cihaz olursa ayrıntı istenecek.
+- "Try again" karşılığı olan Yeniden Oyna düğmesi zaten mevcut.
+
+### Orta boy
+- **Maç tekrarı:** arşivdeki oyunu tahtada adım adım oynatma. Tahta gezinme
+  altyapısı hazır; arşive UCI listesi eklemek ve bir izleme ekranı yazmak
+  gerekiyor.
+- **Hamle kalitesi analizi:** tekrar ekranında her hamleye simge (kitap,
+  yıldız, tik, soru işareti, çarpı). Motor her pozisyonu sabit derinlikte
+  değerlendirip düşüşe göre sınıflar; kitap tespiti için küçük bir açılış
+  tablosu gerekir.
+- **Açılış kütüphanesi:** dünya açılış ve savunmalarının adları; oyun sırasında
+  "İtalyan Açılışı" gibi gösterim. Aynı tablo kitap hamlesi tespitini de besler.
+- **Ön hamle (premove):** sıra rakipteyken sonraki hamleyi çizip sıra gelince
+  otomatik oynatma.
+- **Bulmacalar:** N hamlede mat / kazanç. Veri seti bulunmalı ya da motorla
+  üretilmeli.
+- **Oyun sonu sözleri ve istatistik:** maç bitiminde satranç/zafer üzerine
+  rastgele özlü söz ve kısa istatistik. Söz havuzu metinle başlar,
+  seslendirme sonra.
+- **Başarımlar ve coin:** oyun sonunda performansa göre puan; temaların
+  kilidini açmakta kullanılacak.
+
+### Büyük
+- **Tema paketleri:** uzay, dinozor, antik Mısır/Yunan; tahta + taş + arka plan
+  + fon müziği birlikte; bir kısmı coin/başarımla açılır. Özel gün temaları.
+- **Açılış öğretmeni:** seviyeli ders sistemi, hamleleri açıklayan anlatıcı,
+  sesli yönlendirme. İçerik üretimi işin kendisinden büyük.
+- **Sesli satranç hikâyeleri:** çocuklara yönelik, altyazılı. İçerik ağırlıklı.
+
+## Sıradaki büyük işler
 
 ### Online oyun
-Sırada bekleyen tek büyük iş.
+Mimari hazır; sunucu tarafı ve barındırma kararı bekliyor.
 
 ## Tamamlananlar
 

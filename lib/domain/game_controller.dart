@@ -23,6 +23,7 @@ class GameController extends ChangeNotifier {
     required MatchTransport transport,
     ChessEngine? analysisEngine,
     this.analysisEnabled = true,
+    this.clockGrace = const Duration(seconds: 3),
   }) : _transport = transport,
        _analysisEngine = analysisEngine,
        _position = _positionFromFen(config.startingFen),
@@ -38,6 +39,13 @@ class GameController extends ChangeNotifier {
   final ChessEngine? _analysisEngine;
   final bool analysisEnabled;
   final ChessClock clock;
+
+  /// Oyun başında saatin işlemeye başlamadan önce beklediği süre. İlk hamle
+  /// bu süre dolmadan yapılırsa saat o anda başlar; henüz taşlara bakmakta
+  /// olan bir oyuncunun süresi arayüz açılır açılmaz erimiş olmaz.
+  final Duration clockGrace;
+
+  Timer? _clockGraceTimer;
 
   /// Ekranda geçen süre. Satranç saatinden ayrıdır: süresiz oyunda da işler ve
   /// uygulama arka plana alındığında durur. Ebeveyn bölümü bunu kullanır.
@@ -115,6 +123,10 @@ class GameController extends ChangeNotifier {
     if (!pos.isCheck) return null;
     return pos.board.kingOf(pos.turn);
   }
+
+  /// Hiç hamle oynanmadan biten oyun kayda geçmez: yanlışlıkla açılıp
+  /// kapatılan bir oyun ne mağlubiyet sayılmalı ne arşivde görünmeli.
+  bool get shouldRecord => _moves.isNotEmpty;
 
   /// Yerel oyuncunun sırası mı? Aynı cihazda iki kişilik oyunda daima doğru.
   bool get isLocalTurn {
@@ -198,10 +210,22 @@ class GameController extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    if (!config.timeControl.isUnlimited) {
-      clock.start(_position.turn);
-    }
+    _armClockGrace();
     unawaited(_refreshEvaluation());
+  }
+
+  /// Saati hemen değil, [clockGrace] dolunca başlatır. İlk hamle daha erken
+  /// gelirse [_applyMove] içindeki `switchTo` saati zaten başlatır ve buradaki
+  /// zamanlayıcı koşulları sağlanmadığı için hiçbir şey yapmaz.
+  void _armClockGrace() {
+    if (config.timeControl.isUnlimited) return;
+    _clockGraceTimer?.cancel();
+    _clockGraceTimer = Timer(clockGrace, () {
+      if (_phase == GamePhase.playing && _moves.isEmpty && !clock.isRunning) {
+        clock.start(_position.turn);
+        notifyListeners();
+      }
+    });
   }
 
   // ── Kullanıcı etkileşimi ──
@@ -416,7 +440,7 @@ class GameController extends ChangeNotifier {
     await _transport.send(const RequestRematch());
     if (!config.timeControl.isUnlimited) {
       clock.stop();
-      clock.start(_position.turn);
+      _armClockGrace();
     }
   }
 
@@ -692,6 +716,7 @@ class GameController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _clockGraceTimer?.cancel();
     _eventSub?.cancel();
     clock.dispose();
     _transport.close();

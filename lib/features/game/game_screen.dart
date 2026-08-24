@@ -161,6 +161,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
   void _persistResult(GameResult result) {
     final controller = _controller;
     if (controller == null) return;
+    // Hamlesiz biten oyun kayda geçmez; ne istatistik ne arşiv.
+    if (!controller.shouldRecord) return;
     if (widget.config.kind == MatchKind.engine) {
       if (result.isDraw) {
         AppStorage.bumpStat('draws');

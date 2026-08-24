@@ -1,6 +1,12 @@
+import 'dart:math';
+
+import 'package:dartchess/dartchess.dart';
 import 'package:go_router/go_router.dart';
 
 import '../domain/match/match_protocol.dart';
+import '../domain/model/difficulty.dart';
+import '../domain/model/time_control.dart';
+import '../domain/saved_games.dart';
 import '../features/achievements/achievements_screen.dart';
 import '../features/game/game_screen.dart';
 import '../features/history/archive_screen.dart';
@@ -32,8 +38,22 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/game',
-      builder: (context, state) =>
-          GameScreen(config: state.extra! as MatchConfig),
+      builder: (context, state) {
+        final extra = state.extra;
+        if (extra is SavedGame) {
+          return GameScreen(
+            config: MatchConfig(
+              matchId: 'resume-${Random().nextInt(1 << 32)}',
+              kind: MatchKind.engine,
+              localSide: extra.localSide == 'black' ? Side.black : Side.white,
+              difficulty: DifficultyLevel.fromId(extra.difficultyId),
+              timeControl: TimeControl.fromId(extra.timeControlId),
+            ),
+            resume: extra,
+          );
+        }
+        return GameScreen(config: extra! as MatchConfig);
+      },
     ),
     GoRoute(
       path: '/archive',

@@ -40,6 +40,11 @@ class ChessClock {
     return value < Duration.zero ? Duration.zero : value;
   }
 
+  /// Kaydedilmiş oyundan dönerken kalan süreyi geri yükler.
+  void setRemaining(Side side, Duration value) {
+    _remaining[side] = value < Duration.zero ? Duration.zero : value;
+  }
+
   /// Süresiz oyunda saat hiç çalışmaz.
   void start(Side side) {
     if (timeControl.isUnlimited) return;

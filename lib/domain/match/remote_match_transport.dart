@@ -66,7 +66,10 @@ class RemoteMatchTransport implements MatchTransport {
   MatchConnectionState get connectionState => _connection;
 
   @override
-  Future<void> open(MatchConfig config) async {
+  Future<void> open(
+    MatchConfig config, {
+    List<String> initialMovesUci = const [],
+  }) async {
     _setConnection(MatchConnectionState.connecting);
     _sub = _channel.incoming.listen(
       _onPayload,
@@ -83,6 +86,11 @@ class RemoteMatchTransport implements MatchTransport {
   @override
   Future<void> send(MatchCommand command) async {
     _channel.send(jsonEncode(command.toJson()));
+  }
+
+  @override
+  Future<void> requestOpponentMove() async {
+    // Sunucu sıra bilgisini kendisi tutar; ayrıca çağrı gerekmez.
   }
 
   void _onPayload(String payload) {

@@ -19,9 +19,20 @@ class FakeTransport implements MatchTransport {
   @override
   MatchConnectionState get connectionState => MatchConnectionState.connected;
 
+  List<String> openedWithMoves = const [];
+  int opponentMoveRequests = 0;
+
   @override
-  Future<void> open(MatchConfig config) async =>
-      _events.add(MatchOpened(config));
+  Future<void> open(MatchConfig config,
+      {List<String> initialMovesUci = const []}) async {
+    openedWithMoves = initialMovesUci;
+    _events.add(MatchOpened(config));
+  }
+
+  @override
+  Future<void> requestOpponentMove() async {
+    opponentMoveRequests++;
+  }
 
   @override
   Future<void> send(MatchCommand command) async => sent.add(command);

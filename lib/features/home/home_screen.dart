@@ -8,6 +8,8 @@ import '../../core/l10n/strings.dart';
 import '../../core/storage/app_storage.dart';
 import '../../core/utils/app_version.dart';
 import '../../domain/economy/coin_service.dart';
+import '../../domain/model/difficulty.dart';
+import '../../domain/saved_games.dart';
 import '../board/piece_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -56,83 +58,57 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     enabled: false,
                     onTap: () {},
                   ),
+                  const _ResumeSection(),
                   const SizedBox(height: 24),
                   _StatsPanel(turkish: settings.turkish),
                   const SizedBox(height: 16),
-                  Row(
+                  GridView.count(
+                    crossAxisCount: 4,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: 0.92,
                     children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/lessons'),
-                          icon: const Icon(Icons.school_outlined),
-                          label: Text(s.lessons),
-                        ),
+                      _NavTile(
+                        icon: Icons.school_outlined,
+                        label: s.navSchool,
+                        onTap: () => context.push('/lessons'),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/openings'),
-                          icon: const Icon(Icons.auto_stories_outlined),
-                          label: Text(s.openingLibrary),
-                        ),
+                      _NavTile(
+                        icon: Icons.auto_stories_outlined,
+                        label: s.navOpenings,
+                        onTap: () => context.push('/openings'),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/puzzles'),
-                          icon: const Icon(Icons.extension_outlined),
-                          label: Text(s.puzzles),
-                        ),
+                      _NavTile(
+                        icon: Icons.extension_outlined,
+                        label: s.navPuzzles,
+                        onTap: () => context.push('/puzzles'),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/achievements'),
-                          icon: const Icon(Icons.emoji_events_outlined),
-                          label: Text(
-                            '${s.achievements} · ${CoinService.balance}',
-                          ),
-                        ),
+                      _NavTile(
+                        icon: Icons.menu_book_outlined,
+                        label: s.navStories,
+                        onTap: () => context.push('/stories'),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/themes'),
-                          icon: const Icon(Icons.palette_outlined),
-                          label: Text(s.themePacks),
-                        ),
+                      _NavTile(
+                        icon: Icons.emoji_events_outlined,
+                        label: s.navAwards,
+                        onTap: () => context.push('/achievements'),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/stories'),
-                          icon: const Icon(Icons.menu_book_outlined),
-                          label: Text(s.stories),
-                        ),
+                      _NavTile(
+                        icon: Icons.palette_outlined,
+                        label: s.navThemes,
+                        onTap: () => context.push('/themes'),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/archive'),
-                          icon: const Icon(Icons.history),
-                          label: Text(s.archive),
-                        ),
+                      _NavTile(
+                        icon: Icons.history,
+                        label: s.navGames,
+                        onTap: () => context.push('/archive'),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/settings'),
-                          icon: const Icon(Icons.tune),
-                          label: Text(s.settings),
-                        ),
+                      _NavTile(
+                        icon: Icons.tune,
+                        label: s.navSettings,
+                        onTap: () => context.push('/settings'),
                       ),
                     ],
                   ),
@@ -205,7 +181,189 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
+          _CoinBadge(),
         ],
+      ),
+    );
+  }
+}
+
+/// Kaydedilmiş oyunlar: en çok üç yuva, dokununca kaldığı yerden sürer.
+class _ResumeSection extends ConsumerStatefulWidget {
+  const _ResumeSection();
+
+  @override
+  ConsumerState<_ResumeSection> createState() => _ResumeSectionState();
+}
+
+class _ResumeSectionState extends ConsumerState<_ResumeSection> {
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final settings = ref.watch(settingsProvider);
+    final theme = Theme.of(context);
+    final saved = SavedGameStore.list();
+    if (saved.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        Text(
+          s.resumeGame.toUpperCase(),
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            letterSpacing: 1.1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        for (final game in saved)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Material(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(12),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () async {
+                  await context.push('/game', extra: game);
+                  if (mounted) setState(() {});
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.play_circle_outline,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              DifficultyLevel.fromId(
+                                game.difficultyId,
+                              ).label(settings.turkish),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              s.savedMovesAt(game.moveCount),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 18),
+                        onPressed: () async {
+                          await SavedGameStore.delete(game.difficultyId);
+                          if (mounted) setState(() {});
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Başlıktaki coin rozeti; dokununca başarımlara gider.
+class _CoinBadge extends StatelessWidget {
+  const _CoinBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () => context.push('/achievements'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.paid_outlined, size: 16, color: Color(0xFFE0A62E)),
+            const SizedBox(width: 4),
+            Text(
+              '${CoinService.balance}',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Ana ekran ızgarasındaki tek gezinme kutusu.
+class _NavTile extends StatelessWidget {
+  const _NavTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Material(
+      color: scheme.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: scheme.outlineVariant.withValues(alpha: 0.5),
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 24, color: scheme.primary),
+              const SizedBox(height: 6),
+              // Etiket tek satırda kalır; dar ekranda kırpılmak yerine
+              // sığacak kadar küçülür.
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

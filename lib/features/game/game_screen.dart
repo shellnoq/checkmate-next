@@ -19,6 +19,7 @@ import '../../domain/model/move_record.dart';
 import '../../domain/economy/achievements.dart';
 import '../../domain/economy/coin_service.dart';
 import '../../domain/openings/opening_book.dart';
+import '../../domain/saved_games.dart';
 import '../../app/theme/theme_packs.dart';
 import '../board/chess_board.dart';
 import '../board/game_background.dart';
@@ -29,9 +30,12 @@ import 'widgets/promotion_sheet.dart';
 import 'widgets/victory_burst.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
-  const GameScreen({super.key, required this.config});
+  const GameScreen({super.key, required this.config, this.resume});
 
   final MatchConfig config;
+
+  /// Doluysa oyun bu kayıttan devam eder.
+  final SavedGame? resume;
 
   @override
   ConsumerState<GameScreen> createState() => _GameScreenState();
@@ -162,6 +166,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
     _flushPlaytime();
     _persistResult(result);
     unawaited(_awardCoins(result));
+    // Biten oyun kayıt yuvasını meşgul etmesin.
+    final difficultyId = widget.config.difficulty?.id;
+    if (difficultyId != null) {
+      unawaited(SavedGameStore.delete(difficultyId));
+    }
     final localWon =
         result.winner != null &&
         widget.config.kind == MatchKind.engine &&
@@ -315,29 +324,90 @@ class _GameScreenState extends ConsumerState<GameScreen>
     );
   }
 
-  Future<bool> _confirmLeave() async {
+  /// Çıkış kararı: `null` vazgeç, `true` terk et, `false` kaydedildi/serbest.
+  Future<bool?> _confirmLeave() async {
     final controller = _controller;
     if (controller == null || controller.phase != GamePhase.playing) {
-      return true;
+      return false;
     }
     final s = S.of(context);
-    final leave = await showDialog<bool>(
+
+    // Motora karşı, hamlesi olan oyun kaydedilebilir.
+    final canSave =
+        widget.config.kind == MatchKind.engine &&
+        controller.moves.isNotEmpty &&
+        widget.config.difficulty != null;
+
+    if (!canSave) {
+      final resign = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(s.confirmResign),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(s.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(s.resign),
+            ),
+          ],
+        ),
+      );
+      return (resign ?? false) ? true : null;
+    }
+
+    final choice = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(s.confirmResign),
+        title: Text(s.leaveGameTitle),
+        content: Text(s.leaveGameHint),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(context).pop('cancel'),
             child: Text(s.cancel),
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('resign'),
             child: Text(s.resign),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop('save'),
+            child: Text(s.saveAndExit),
           ),
         ],
       ),
     );
-    return leave ?? false;
+    switch (choice) {
+      case 'save':
+        await _saveGame(controller);
+        return false;
+      case 'resign':
+        return true;
+      default:
+        return null;
+    }
+  }
+
+  Future<void> _saveGame(GameController controller) async {
+    final unlimited = widget.config.timeControl.isUnlimited;
+    await SavedGameStore.save(
+      SavedGame(
+        difficultyId: widget.config.difficulty!.id,
+        localSide: widget.config.localSide.name,
+        timeControlId: widget.config.timeControl.id,
+        uci: [for (final m in controller.moves) m.uci],
+        savedAt: DateTime.now(),
+        whiteRemainingMs: unlimited
+            ? null
+            : controller.clock.remainingOf(Side.white).inMilliseconds,
+        blackRemainingMs: unlimited
+            ? null
+            : controller.clock.remainingOf(Side.black).inMilliseconds,
+      ),
+    );
+    _flushPlaytime();
   }
 
   @override
@@ -407,8 +477,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) return;
         final router = GoRouter.of(context);
-        if (!await _confirmLeave()) return;
-        if (controller.phase == GamePhase.playing) {
+        final decision = await _confirmLeave();
+        if (decision == null) return; // vazgeçildi
+        if (decision && controller.phase == GamePhase.playing) {
           await controller.resign();
         }
         if (mounted) router.pop();

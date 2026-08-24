@@ -19,7 +19,17 @@ abstract interface class MatchTransport {
   MatchConnectionState get connectionState;
 
   /// Maçı kurar. Online'da sunucuya bağlanır.
-  Future<void> open(MatchConfig config);
+  ///
+  /// [initialMovesUci] verilirse maç o hamleler oynanmış hâlde açılır;
+  /// kaydedilmiş bir oyuna devam ederken kullanılır.
+  Future<void> open(
+    MatchConfig config, {
+    List<String> initialMovesUci = const [],
+  });
+
+  /// Sıra rakipteyse rakibi hamleye çağırır; kayıttan dönüşte gerekir.
+  /// Sırası olmayan ya da rakibi yerel olan gerçeklemeler yok sayar.
+  Future<void> requestOpponentMove();
 
   /// Yerel oyuncunun komutunu rakibe iletir.
   Future<void> send(MatchCommand command);

@@ -25,6 +25,9 @@ class GameController extends ChangeNotifier {
     ChessEngine? analysisEngine,
     this.analysisEnabled = true,
     this.clockGrace = const Duration(seconds: 3),
+    this.resumeMovesUci = const [],
+    this.resumeWhiteClock,
+    this.resumeBlackClock,
   }) : _transport = transport,
        _analysisEngine = analysisEngine,
        _position = _positionFromFen(config.startingFen),
@@ -45,6 +48,11 @@ class GameController extends ChangeNotifier {
   /// bu süre dolmadan yapılırsa saat o anda başlar; henüz taşlara bakmakta
   /// olan bir oyuncunun süresi arayüz açılır açılmaz erimiş olmaz.
   final Duration clockGrace;
+
+  /// Kaydedilmiş oyundan devam ediliyorsa baştan oynanacak hamleler.
+  final List<String> resumeMovesUci;
+  final Duration? resumeWhiteClock;
+  final Duration? resumeBlackClock;
 
   Timer? _clockGraceTimer;
 
@@ -215,10 +223,17 @@ class GameController extends ChangeNotifier {
     _eventSub = _transport.events.listen(_onMatchEvent);
     _phase = GamePhase.playing;
     _playClock.start();
+    if (resumeMovesUci.isNotEmpty) {
+      _restoreMoves(resumeMovesUci);
+      final white = resumeWhiteClock;
+      final black = resumeBlackClock;
+      if (white != null) clock.setRemaining(Side.white, white);
+      if (black != null) clock.setRemaining(Side.black, black);
+    }
     _refreshLegalDests();
     notifyListeners();
     try {
-      await _transport.open(config);
+      await _transport.open(config, initialMovesUci: resumeMovesUci);
     } catch (e) {
       _lastError = e;
       notifyListeners();
@@ -228,14 +243,33 @@ class GameController extends ChangeNotifier {
     unawaited(_refreshEvaluation());
   }
 
+  /// Kaydedilmiş hamleleri sessizce uygular: ses, bildirim ve saat geçişi
+  /// olmadan yalnızca durum kurulur.
+  void _restoreMoves(List<String> uciList) {
+    for (final uci in uciList) {
+      final normalized = _position.normalizeMove(NormalMove.fromUci(uci));
+      final mover = _position.turn;
+      final (next, san) = _position.makeSan(normalized);
+      _position = next;
+      _moves.add(
+        MoveRecord(uci: uci, san: san, fenAfter: next.fen, side: mover),
+      );
+      _countRepetition(next);
+    }
+    _browseIndex = _moves.length;
+  }
+
   /// Saati hemen değil, [clockGrace] dolunca başlatır. İlk hamle daha erken
   /// gelirse [_applyMove] içindeki `switchTo` saati zaten başlatır ve buradaki
   /// zamanlayıcı koşulları sağlanmadığı için hiçbir şey yapmaz.
   void _armClockGrace() {
     if (config.timeControl.isUnlimited) return;
     _clockGraceTimer?.cancel();
+    final movesAtArm = _moves.length;
     _clockGraceTimer = Timer(clockGrace, () {
-      if (_phase == GamePhase.playing && _moves.isEmpty && !clock.isRunning) {
+      if (_phase == GamePhase.playing &&
+          _moves.length == movesAtArm &&
+          !clock.isRunning) {
         clock.start(_position.turn);
         notifyListeners();
       }

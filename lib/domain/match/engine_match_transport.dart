@@ -36,9 +36,14 @@ class EngineMatchTransport implements MatchTransport {
   MatchConnectionState get connectionState => _connection;
 
   @override
-  Future<void> open(MatchConfig config) async {
+  Future<void> open(
+    MatchConfig config, {
+    List<String> initialMovesUci = const [],
+  }) async {
     _config = config;
-    _moves.clear();
+    _moves
+      ..clear()
+      ..addAll(initialMovesUci);
     _setConnection(MatchConnectionState.connecting);
 
     final difficulty = config.difficulty ?? DifficultyLevel.club;
@@ -47,11 +52,20 @@ class EngineMatchTransport implements MatchTransport {
     _setConnection(MatchConnectionState.connected);
     _emit(MatchOpened(config));
 
-    // Motor beyazsa ilk hamleyi o yapar.
+    // Sıra motordaysa (yeni oyunda motor beyazsa ya da kayıt motorun
+    // sırasında alınmışsa) ilk hamleyi o yapar.
     final startingSide = _sideToMoveOf(config.startingFen);
-    if (startingSide != config.localSide) {
+    final sideToMove = initialMovesUci.length.isEven
+        ? startingSide
+        : startingSide.opposite;
+    if (sideToMove != config.localSide) {
       unawaited(_think());
     }
+  }
+
+  @override
+  Future<void> requestOpponentMove() async {
+    unawaited(_think());
   }
 
   @override

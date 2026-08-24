@@ -21,7 +21,10 @@ class LocalMatchTransport implements MatchTransport {
   MatchConnectionState get connectionState => _connection;
 
   @override
-  Future<void> open(MatchConfig config) async {
+  Future<void> open(
+    MatchConfig config, {
+    List<String> initialMovesUci = const [],
+  }) async {
     _config = config;
     _connection = MatchConnectionState.connected;
     _emit(MatchConnectionChanged(_connection));
@@ -45,6 +48,11 @@ class LocalMatchTransport implements MatchTransport {
       case RespondToDrawOffer():
         break;
     }
+  }
+
+  @override
+  Future<void> requestOpponentMove() async {
+    // Rakip de yerel; çağıracak kimse yok.
   }
 
   void _emit(MatchEvent event) {

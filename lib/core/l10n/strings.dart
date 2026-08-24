@@ -118,6 +118,27 @@ class S {
   String get categoryClosed => _('Kapalı Oyunlar', 'Closed Games');
   String get categoryFlank => _('Kanat Açılışları', 'Flank Openings');
 
+  // Ana ekran kısa gezinme etiketleri: dar kutulara sığacak tek kelimeler.
+  String get navSchool => _('Okul', 'School');
+  String get navOpenings => _('Açılışlar', 'Openings');
+  String get navPuzzles => _('Bulmacalar', 'Puzzles');
+  String get navStories => _('Hikâyeler', 'Stories');
+  String get navAwards => _('Başarımlar', 'Awards');
+  String get navThemes => _('Temalar', 'Themes');
+  String get navGames => _('Oyunlarım', 'My Games');
+  String get navSettings => _('Ayarlar', 'Settings');
+  String get resumeGame => _('Devam Et', 'Resume');
+  String get saveAndExit => _('Kaydet ve Çık', 'Save & Exit');
+  String get leaveGameTitle => _('Oyundan çıkılsın mı?', 'Leave the game?');
+  String get leaveGameHint => _(
+    'Kaydedersen kaldığın yerden devam edebilirsin. Terk edersen oyun '
+        'mağlubiyet sayılır.',
+    'Save it and you can pick up where you left off. Resigning counts '
+        'as a loss.',
+  );
+  String get gameSaved => _('Oyun kaydedildi', 'Game saved');
+  String savedMovesAt(int moves) => _('$moves hamle', '$moves moves');
+
   // Hikâyeler
   String get stories => _('Hikâyeler', 'Stories');
   String get storyListen => _('Dinle', 'Listen');

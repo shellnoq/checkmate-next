@@ -70,6 +70,11 @@ class GameController extends ChangeNotifier {
   Square? _selected;
   Map<Square, Set<Square>> _legalDests = const {};
   NormalMove? _pendingPromotion;
+
+  /// Sıra rakipteyken çizilen ön hamle. Sıra gelince yasalsa oynanır,
+  /// değilse sessizce silinir.
+  Square? _premoveFrom;
+  NormalMove? _premove;
   bool _opponentThinking = false;
   bool _drawOfferPending = false;
   EngineLine? _evaluation;
@@ -99,6 +104,14 @@ class GameController extends ChangeNotifier {
   GameResult? get result => _result;
   Square? get selectedSquare => _selected;
   NormalMove? get pendingPromotion => _pendingPromotion;
+  Square? get premoveFrom => _premoveFrom;
+  NormalMove? get premove => _premove;
+
+  /// Tahtada vurgulanacak ön hamle kareleri.
+  Set<Square> get premoveSquares => {
+    if (_premoveFrom != null) _premoveFrom!,
+    if (_premove != null) ...[_premove!.from, _premove!.to],
+  };
   bool get opponentThinking => _opponentThinking;
   bool get drawOfferPending => _drawOfferPending;
   EngineLine? get evaluation => _evaluation;
@@ -237,6 +250,13 @@ class GameController extends ChangeNotifier {
       goLive();
       return;
     }
+    if (_phase == GamePhase.playing &&
+        !isLocalTurn &&
+        config.kind != MatchKind.passAndPlay &&
+        _pendingPromotion == null) {
+      _premoveTap(square);
+      return;
+    }
     if (!isLocalTurn || _pendingPromotion != null) return;
 
     final current = _selected;
@@ -257,8 +277,66 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _premoveTap(Square square) {
+    // Dolu bir ön hamle varken her dokunuş onu iptal eder; kendi taşına
+    // dokunulduysa aynı dokunuş yeni ön hamlenin başlangıcı olur.
+    if (_premove != null) {
+      _premove = null;
+      _premoveFrom = null;
+    } else if (_premoveFrom != null) {
+      if (square == _premoveFrom) {
+        _premoveFrom = null;
+      } else {
+        _premove = NormalMove(from: _premoveFrom!, to: square);
+        _premoveFrom = null;
+      }
+      notifyListeners();
+      return;
+    }
+    final piece = _position.board.pieceAt(square);
+    if (piece != null && piece.color == config.localSide) {
+      _premoveFrom = square;
+    }
+    notifyListeners();
+  }
+
+  void _tryPremove() {
+    final premove = _premove;
+    _premove = null;
+    _premoveFrom = null;
+    if (premove == null ||
+        _phase != GamePhase.playing ||
+        !isLocalTurn ||
+        _pendingPromotion != null) {
+      return;
+    }
+    // Terfi gerektiren ön hamle vezire terfi eder; sıra rakipteyken taş
+    // seçtirmenin bir yolu yok ve vezir açık ara en yaygın seçimdir.
+    final move = _requiresPromotion(premove)
+        ? premove.withPromotion(Role.queen)
+        : premove;
+    final normalized = _position.normalizeMove(move);
+    if (_position.isLegal(normalized)) {
+      _applyLocalMove(move);
+    } else {
+      notifyListeners();
+    }
+  }
+
   /// Sürükle-bırak ile hamle.
   void moveByDrag(Square from, Square to) {
+    if (_phase == GamePhase.playing &&
+        !isLocalTurn &&
+        config.kind != MatchKind.passAndPlay &&
+        _pendingPromotion == null) {
+      final piece = _position.board.pieceAt(from);
+      if (piece != null && piece.color == config.localSide && from != to) {
+        _premove = NormalMove(from: from, to: to);
+        _premoveFrom = null;
+        notifyListeners();
+      }
+      return;
+    }
     if (isBrowsingHistory || !isLocalTurn || _pendingPromotion != null) return;
     final dests = _legalDests[from] ?? const <Square>{};
     if (!dests.contains(to)) {
@@ -469,6 +547,7 @@ class GameController extends ChangeNotifier {
       case RemoteMove(:final uci):
         final move = NormalMove.fromUci(uci);
         _applyMove(move);
+        _tryPremove();
       case RemoteThinking(:final value):
         _opponentThinking = value;
         notifyListeners();
@@ -511,6 +590,8 @@ class GameController extends ChangeNotifier {
     _browseIndex = _moves.length;
     _selected = null;
     _hintUci = null;
+    _premove = null;
+    _premoveFrom = null;
     _refreshLegalDests();
     notifyListeners();
     unawaited(_refreshEvaluation());
@@ -558,6 +639,8 @@ class GameController extends ChangeNotifier {
     _result = result;
     _selected = null;
     _pendingPromotion = null;
+    _premove = null;
+    _premoveFrom = null;
     _opponentThinking = false;
     clock.stop();
     _legalDests = const {};

@@ -5,11 +5,13 @@ import 'package:checkmate_next/domain/match/match_transport.dart';
 
 /// Testlerde rakip yerine geçen, gönderilen komutları kaydeden taşıma katmanı.
 class FakeTransport implements MatchTransport {
+  FakeTransport({this.kind = MatchKind.passAndPlay});
+
   final _events = StreamController<MatchEvent>.broadcast();
   final List<MatchCommand> sent = [];
 
   @override
-  MatchKind get kind => MatchKind.passAndPlay;
+  final MatchKind kind;
 
   @override
   Stream<MatchEvent> get events => _events.stream;

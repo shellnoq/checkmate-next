@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/providers/engine_provider.dart';
 import '../../app/providers/settings.dart';
 import '../../core/audio/sound_service.dart';
+import '../../core/l10n/endgame_quotes.dart';
 import '../../core/l10n/strings.dart';
 import '../../core/storage/app_storage.dart';
 import '../../domain/game_controller.dart';
@@ -243,6 +244,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
       builder: (context) => _ResultSheet(
         result: result,
         celebrationParticles: settings.ageGroup.celebrationParticles,
+        moveCount: controller.moves.length,
+        playedTime: controller.playedTime,
         turkish: settings.turkish,
         localSide: widget.config.kind == MatchKind.engine
             ? widget.config.localSide
@@ -489,6 +492,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                                     lastMove: controller.lastMoveSquares,
                                     checkedSquare: controller.checkedKingSquare,
                                     hintMove: _hintSquares(controller),
+                                    premoveSquares: controller.premoveSquares,
                                     interactive:
                                         controller.phase == GamePhase.playing,
                                     showCoordinates: settings.showCoordinates,
@@ -679,6 +683,41 @@ class _ActionBar extends StatelessWidget {
   }
 }
 
+class _StatChip extends StatelessWidget {
+  const _StatChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 4),
+          Text(label, style: theme.textTheme.labelSmall),
+        ],
+      ),
+    );
+  }
+}
+
+String _formatPlayed(Duration value, bool turkish) {
+  final minutes = value.inMinutes;
+  if (minutes < 1) {
+    return turkish ? '${value.inSeconds} sn' : '${value.inSeconds}s';
+  }
+  return turkish ? '$minutes dk' : '${minutes}m';
+}
+
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.icon,
@@ -745,6 +784,8 @@ class _ResultSheet extends StatefulWidget {
   const _ResultSheet({
     required this.result,
     required this.celebrationParticles,
+    required this.moveCount,
+    required this.playedTime,
     required this.turkish,
     required this.localSide,
     required this.strings,
@@ -757,6 +798,9 @@ class _ResultSheet extends StatefulWidget {
 
   /// Sıfırsa kutlama yalnızca simge animasyonuyla sınırlı kalır.
   final int celebrationParticles;
+
+  final int moveCount;
+  final Duration playedTime;
 
   final bool turkish;
   final Side? localSide;
@@ -866,7 +910,57 @@ class _ResultSheetState extends State<_ResultSheet>
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 14),
+              Builder(
+                builder: (context) {
+                  // Söz, sayfa yeniden çizildiğinde değişmesin diye sonuçtan
+                  // türetilen sabit bir tohumla seçilir.
+                  final quote = EndgameQuotes.pick(
+                    won: result.isDraw
+                        ? null
+                        : (localSide != null
+                              ? result.winner == localSide
+                              : result.winner == Side.white),
+                    seed: widget.moveCount * 31 + result.reason.index,
+                  );
+                  return Column(
+                    children: [
+                      Text(
+                        '"${quote.text(turkish)}"',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '— ${quote.author}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _StatChip(
+                    icon: Icons.swap_vert,
+                    label: turkish
+                        ? '${widget.moveCount} hamle'
+                        : '${widget.moveCount} moves',
+                  ),
+                  const SizedBox(width: 10),
+                  _StatChip(
+                    icon: Icons.timer_outlined,
+                    label: _formatPlayed(widget.playedTime, turkish),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
               FilledButton.icon(
                 onPressed: widget.onRematch,
                 icon: const Icon(Icons.replay),

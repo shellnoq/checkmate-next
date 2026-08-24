@@ -40,6 +40,7 @@ class ChessBoard extends StatefulWidget {
     this.lastMove,
     this.checkedSquare,
     this.hintMove,
+    this.premoveSquares = const {},
     this.interactive = true,
     this.showCoordinates = true,
     this.showLegalMoves = true,
@@ -63,6 +64,9 @@ class ChessBoard extends StatefulWidget {
 
   /// İpucu oku için hamle.
   final (Square, Square)? hintMove;
+
+  /// Ön hamle kareleri; ayrı bir renkle vurgulanır.
+  final Set<Square> premoveSquares;
 
   final bool interactive;
   final bool showCoordinates;
@@ -362,6 +366,9 @@ class _ChessBoardState extends State<ChessBoard> with TickerProviderStateMixin {
     Color? overlay;
     if (isChecked) {
       overlay = theme.check;
+    } else if (widget.premoveSquares.contains(square)) {
+      // Ön hamle: tema renklerinden bağımsız, ayırt edici bir mavi.
+      overlay = const Color(0x5532719C);
     } else if (widget.selectedSquare == square) {
       overlay = theme.selection;
     } else if (widget.lastMove != null &&

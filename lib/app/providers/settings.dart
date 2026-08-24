@@ -35,6 +35,9 @@ class AppSettings {
   /// Fon müziği düzeyi (0-1); 0 kapalı.
   final double musicVolume;
 
+  /// Tahtayı masa gibi hafif yatırarak göster.
+  final bool boardTilt;
+
   const AppSettings({
     required this.locale,
     required this.themeMode,
@@ -52,6 +55,7 @@ class AppSettings {
     required this.dailyLimit,
     required this.themePack,
     required this.musicVolume,
+    required this.boardTilt,
   });
 
   bool get turkish => locale.languageCode == 'tr';
@@ -73,6 +77,7 @@ class AppSettings {
     Duration? dailyLimit,
     ThemePack? themePack,
     double? musicVolume,
+    bool? boardTilt,
   }) => AppSettings(
     locale: locale ?? this.locale,
     themeMode: themeMode ?? this.themeMode,
@@ -90,6 +95,7 @@ class AppSettings {
     dailyLimit: dailyLimit ?? this.dailyLimit,
     themePack: themePack ?? this.themePack,
     musicVolume: musicVolume ?? this.musicVolume,
+    boardTilt: boardTilt ?? this.boardTilt,
   );
 
   static AppSettings load() => AppSettings(
@@ -121,6 +127,7 @@ class AppSettings {
       AppStorage.get<String>('themePack', 'classic'),
     ),
     musicVolume: (AppStorage.get<double>('musicVolume', 0.0)).clamp(0.0, 1.0),
+    boardTilt: AppStorage.get<bool>('boardTilt', false),
   );
 }
 
@@ -195,6 +202,11 @@ class SettingsController extends StateNotifier<AppSettings> {
     await AppStorage.set('themePack', pack.id);
     await AppStorage.set('boardTheme', pack.boardTheme.id);
     await AppStorage.set('pieceSet', pack.pieceSet.id);
+  }
+
+  Future<void> setBoardTilt(bool value) async {
+    state = state.copyWith(boardTilt: value);
+    await AppStorage.set('boardTilt', value);
   }
 
   Future<void> setMusicVolume(double volume) async {

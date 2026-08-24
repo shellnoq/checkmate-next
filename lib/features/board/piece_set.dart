@@ -20,6 +20,9 @@ class PieceSet {
   final Color blackDetail;
   final PieceShape shape;
 
+  /// Doğruysa taşlar degrade dolgu ve zemin gölgesiyle, kabartmalı çizilir.
+  final bool dimensional;
+
   const PieceSet({
     required this.id,
     required this.trName,
@@ -31,6 +34,7 @@ class PieceSet {
     required this.blackStroke,
     required this.blackDetail,
     this.shape = PieceShape.classic,
+    this.dimensional = false,
   });
 
   String label(bool turkish) => turkish ? trName : enName;
@@ -85,7 +89,21 @@ class PieceSet {
     blackDetail: Color(0xFFFFF3D6),
   );
 
-  static const all = <PieceSet>[classic, wood, cobalt, playful];
+  /// Derinlik yanılsaması: degrade gövde, parlama ve zemin gölgesi.
+  static const depth = PieceSet(
+    id: 'depth',
+    trName: 'Derinlikli',
+    enName: '3D Look',
+    dimensional: true,
+    whiteFill: Color(0xFFF4F1E8),
+    whiteStroke: Color(0xFF2A2F35),
+    whiteDetail: Color(0xFF2A2F35),
+    blackFill: Color(0xFF31383F),
+    blackStroke: Color(0xFF0B0F13),
+    blackDetail: Color(0xFFE9E5DA),
+  );
+
+  static const all = <PieceSet>[classic, wood, cobalt, playful, depth];
 
   static PieceSet fromId(String? id) =>
       all.firstWhere((s) => s.id == id, orElse: () => classic);

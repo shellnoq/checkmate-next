@@ -23,8 +23,10 @@ class FakeTransport implements MatchTransport {
   int opponentMoveRequests = 0;
 
   @override
-  Future<void> open(MatchConfig config,
-      {List<String> initialMovesUci = const []}) async {
+  Future<void> open(
+    MatchConfig config, {
+    List<String> initialMovesUci = const [],
+  }) async {
     openedWithMoves = initialMovesUci;
     _events.add(MatchOpened(config));
   }

@@ -47,11 +47,55 @@ class PieceSvg {
     // grubunda taşlar birbirinden daha kolay ayrılır.
     final strokeWidth = set.shape == PieceShape.playful ? 2.0 : 1.5;
 
+    if (!set.dimensional) {
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45">'
+          '<g fill="$fill" stroke="$stroke" stroke-width="$strokeWidth" '
+          'stroke-linejoin="round" stroke-linecap="round">'
+          '$body'
+          '</g></svg>';
+    }
+
+    // Kabartmalı çizim: sol üstten gelen ışığa göre degrade gövde, ince bir
+    // tepe parlaması ve taşın altında yumuşak bir zemin gölgesi.
+    final base = set.fillOf(piece.color);
+    final gradientId = 'g_${set.id}_${piece.color.name}_${piece.role.name}';
+    final top = _hex(_shift(base, 0.28));
+    final mid = _hex(base);
+    final bottom = _hex(_shift(base, -0.22));
+
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45">'
-        '<g fill="$fill" stroke="$stroke" stroke-width="$strokeWidth" '
-        'stroke-linejoin="round" stroke-linecap="round">'
+        '<defs>'
+        '<linearGradient id="$gradientId" x1="0" y1="0" x2="1" y2="1">'
+        '<stop offset="0" stop-color="$top"/>'
+        '<stop offset="0.45" stop-color="$mid"/>'
+        '<stop offset="1" stop-color="$bottom"/>'
+        '</linearGradient>'
+        '</defs>'
+        '<ellipse cx="22.5" cy="41.6" rx="15.5" ry="2.6" fill="#000000" '
+        'opacity="0.28"/>'
+        '<g fill="url(#$gradientId)" stroke="$stroke" '
+        'stroke-width="$strokeWidth" stroke-linejoin="round" '
+        'stroke-linecap="round">'
         '$body'
         '</g></svg>';
+  }
+
+  /// Rengi [amount] kadar aydınlatır (pozitif) ya da koyulaştırır (negatif).
+  static Color _shift(Color color, double amount) {
+    int channel(double value) {
+      final shifted = amount >= 0
+          ? value + (255 - value) * amount
+          : value * (1 + amount);
+      return shifted.clamp(0, 255).round();
+    }
+
+    final argb = color.toARGB32();
+    return Color.fromARGB(
+      255,
+      channel(((argb >> 16) & 0xFF).toDouble()),
+      channel(((argb >> 8) & 0xFF).toDouble()),
+      channel((argb & 0xFF).toDouble()),
+    );
   }
 
   // ── Neşeli takım: tombul gövdeler, yuvarlak hatlar, kalın kontur ──

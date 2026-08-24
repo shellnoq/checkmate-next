@@ -62,6 +62,7 @@ class S {
   String get takeback => _('Geri Al', 'Take Back');
   String get hint => _('İpucu', 'Hint');
   String get flipBoard => _('Tahtayı Çevir', 'Flip Board');
+  String get tiltBoard => _('Masa Görünümü', 'Table View');
   String get moves => _('Hamleler', 'Moves');
   String get analysis => _('Analiz', 'Analysis');
   String get rematch => _('Yeniden Oyna', 'Rematch');

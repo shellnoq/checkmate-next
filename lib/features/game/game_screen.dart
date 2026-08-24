@@ -596,28 +596,35 @@ class _GameScreenState extends ConsumerState<GameScreen>
                                     ),
                                     const SizedBox(width: 6),
                                   ],
-                                  SizedBox(
-                                    width: boardSize,
-                                    height: boardSize,
-                                    child: ChessBoard(
-                                      position: displayed,
-                                      orientation: orientation,
-                                      boardTheme: settings.boardTheme,
-                                      pieceSet: settings.pieceSet,
-                                      legalDestinations:
-                                          controller.destinationsForSelected,
-                                      selectedSquare: controller.selectedSquare,
-                                      lastMove: controller.lastMoveSquares,
-                                      checkedSquare:
-                                          controller.checkedKingSquare,
-                                      hintMove: _hintSquares(controller),
-                                      premoveSquares: controller.premoveSquares,
-                                      interactive:
-                                          controller.phase == GamePhase.playing,
-                                      showCoordinates: settings.showCoordinates,
-                                      showLegalMoves: settings.showLegalMoves,
-                                      onSquareTap: controller.selectSquare,
-                                      onMove: controller.moveByDrag,
+                                  _TiltWrap(
+                                    enabled: settings.boardTilt,
+                                    child: SizedBox(
+                                      width: boardSize,
+                                      height: boardSize,
+                                      child: ChessBoard(
+                                        position: displayed,
+                                        orientation: orientation,
+                                        boardTheme: settings.boardTheme,
+                                        pieceSet: settings.pieceSet,
+                                        legalDestinations:
+                                            controller.destinationsForSelected,
+                                        selectedSquare:
+                                            controller.selectedSquare,
+                                        lastMove: controller.lastMoveSquares,
+                                        checkedSquare:
+                                            controller.checkedKingSquare,
+                                        hintMove: _hintSquares(controller),
+                                        premoveSquares:
+                                            controller.premoveSquares,
+                                        interactive:
+                                            controller.phase ==
+                                            GamePhase.playing,
+                                        showCoordinates:
+                                            settings.showCoordinates,
+                                        showLegalMoves: settings.showLegalMoves,
+                                        onSquareTap: controller.selectSquare,
+                                        onMove: controller.moveByDrag,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -802,6 +809,29 @@ class _ActionBar extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Tahtayı masaya bakar gibi hafifçe yatırır.
+///
+/// Dönüşüm dokunuşları da ters eşlediği için etkileşim bozulmaz; kapalıyken
+/// hiçbir katman eklenmez.
+class _TiltWrap extends StatelessWidget {
+  const _TiltWrap({required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!enabled) return child;
+    return Transform(
+      alignment: Alignment.center,
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.0016)
+        ..rotateX(0.42),
+      child: child,
     );
   }
 }

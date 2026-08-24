@@ -19,12 +19,12 @@ void main() {
   });
 
   SavedGame make(String level, DateTime at, [List<String>? uci]) => SavedGame(
-        difficultyId: level,
-        localSide: 'white',
-        timeControlId: 'unlimited',
-        uci: uci ?? const ['e2e4'],
-        savedAt: at,
-      );
+    difficultyId: level,
+    localSide: 'white',
+    timeControlId: 'unlimited',
+    uci: uci ?? const ['e2e4'],
+    savedAt: at,
+  );
 
   group('SavedGameStore', () {
     setUp(() async {
@@ -36,7 +36,8 @@ void main() {
     test('aynı kademeye kayıt üzerine yazar', () async {
       await SavedGameStore.save(make('club', DateTime(2026, 1, 1)));
       await SavedGameStore.save(
-          make('club', DateTime(2026, 1, 2), ['e2e4', 'e7e5']));
+        make('club', DateTime(2026, 1, 2), ['e2e4', 'e7e5']),
+      );
       final games = SavedGameStore.list();
       expect(games.length, 1);
       expect(games.single.moveCount, 2);
@@ -81,20 +82,19 @@ void main() {
       TimeControl timeControl = TimeControl.unlimited,
       Duration? white,
       Duration? black,
-    }) =>
-        GameController(
-          config: MatchConfig(
-            matchId: 'resume-test',
-            kind: MatchKind.engine,
-            localSide: localSide,
-            timeControl: timeControl,
-          ),
-          transport: transport,
-          analysisEnabled: false,
-          resumeMovesUci: resume,
-          resumeWhiteClock: white,
-          resumeBlackClock: black,
-        );
+    }) => GameController(
+      config: MatchConfig(
+        matchId: 'resume-test',
+        kind: MatchKind.engine,
+        localSide: localSide,
+        timeControl: timeControl,
+      ),
+      transport: transport,
+      analysisEnabled: false,
+      resumeMovesUci: resume,
+      resumeWhiteClock: white,
+      resumeBlackClock: black,
+    );
 
     test('hamleler sessizce kurulur, taşıma katmanına gönderilmez', () async {
       final transport = FakeTransport(kind: MatchKind.engine);
@@ -121,10 +121,14 @@ void main() {
       );
       await controller.start();
 
-      expect(controller.clock.remainingOf(Side.white),
-          const Duration(seconds: 100));
-      expect(controller.clock.remainingOf(Side.black),
-          const Duration(seconds: 80));
+      expect(
+        controller.clock.remainingOf(Side.white),
+        const Duration(seconds: 100),
+      );
+      expect(
+        controller.clock.remainingOf(Side.black),
+        const Duration(seconds: 80),
+      );
       controller.dispose();
     });
 

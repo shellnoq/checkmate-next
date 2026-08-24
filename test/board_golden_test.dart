@@ -97,6 +97,26 @@ void main() {
     );
   });
 
+  testWidgets('derinlikli takım — kabartma görünüm', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(440, 440));
+    await tester.pumpWidget(
+      wrap(
+        ChessBoard(
+          position: Chess.initial,
+          orientation: Side.white,
+          boardTheme: BoardTheme.marble,
+          pieceSet: PieceSet.depth,
+          interactive: false,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byType(ChessBoard),
+      matchesGoldenFile('goldens/board_depth.png'),
+    );
+  });
+
   testWidgets('siyah yönünde tahta — kobalt takım, şah vurgusu', (
     tester,
   ) async {

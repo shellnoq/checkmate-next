@@ -109,7 +109,7 @@ class GameController extends ChangeNotifier {
 
   /// Tahtada vurgulanacak ön hamle kareleri.
   Set<Square> get premoveSquares => {
-    if (_premoveFrom != null) _premoveFrom!,
+    ?_premoveFrom,
     if (_premove != null) ...[_premove!.from, _premove!.to],
   };
   bool get opponentThinking => _opponentThinking;

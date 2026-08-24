@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers/engine_provider.dart';
 import '../../app/providers/settings.dart';
+import '../../core/storage/app_storage.dart';
 import '../../core/l10n/strings.dart';
 import '../../domain/analysis/game_analyzer.dart';
 import '../../domain/model/difficulty.dart';
@@ -114,6 +115,7 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
       );
       if (mounted && analysis != null) {
         setState(() => _analysis = analysis);
+        await AppStorage.bumpStat('analyses_run');
       }
     } catch (e) {
       if (mounted) {

@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 
 import '../domain/match/match_protocol.dart';
+import '../features/achievements/achievements_screen.dart';
 import '../features/game/game_screen.dart';
 import '../features/history/archive_screen.dart';
 import '../features/history/replay_screen.dart';
@@ -41,6 +42,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/openings',
       builder: (context, state) => const OpeningsScreen(),
+    ),
+    GoRoute(
+      path: '/achievements',
+      builder: (context, state) => const AchievementsScreen(),
     ),
     GoRoute(
       path: '/puzzles',

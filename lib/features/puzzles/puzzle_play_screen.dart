@@ -8,6 +8,8 @@ import '../../core/audio/sound_service.dart';
 import '../../core/l10n/strings.dart';
 import '../../core/storage/app_storage.dart';
 import '../../domain/puzzles/puzzle.dart';
+import '../../domain/economy/achievements.dart';
+import '../../domain/economy/coin_service.dart';
 import '../../domain/puzzles/puzzle_session.dart';
 import '../board/chess_board.dart';
 
@@ -76,9 +78,7 @@ class _PuzzlePlayScreenState extends ConsumerState<PuzzlePlayScreen> {
           _lastMove = (move.from, move.to);
           _finished = true;
         });
-        AppStorage.bumpStat('puzzle_solved_${_puzzle.id}');
-        AppStorage.bumpStat('puzzles_solved_total');
-        _showSolvedSheet();
+        _rewardAndShow();
       case PuzzleWrong():
         SoundService.instance.haptic(HapticStrength.medium);
         setState(() => _selected = null);
@@ -90,6 +90,30 @@ class _PuzzlePlayScreenState extends ConsumerState<PuzzlePlayScreen> {
           _lastMove = (reply.from, reply.to);
         });
     }
+  }
+
+  Future<void> _rewardAndShow() async {
+    final firstSolve = AppStorage.statOf('puzzle_solved_${_puzzle.id}') == 0;
+    await AppStorage.bumpStat('puzzle_solved_${_puzzle.id}');
+    await AppStorage.bumpStat('puzzles_solved_total');
+    var earned = 0;
+    if (firstSolve) {
+      earned = CoinService.puzzleReward(_puzzle.mateIn);
+      await CoinService.add(earned);
+    }
+    final unlocked = await AchievementService.checkAll();
+    if (!mounted) return;
+    final s = S.of(context);
+    for (final achievement in unlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            s.achievementUnlocked(achievement.label(s.tr), achievement.coins),
+          ),
+        ),
+      );
+    }
+    await _showSolvedSheet(earned);
   }
 
   void _showWrongBar() {
@@ -110,7 +134,7 @@ class _PuzzlePlayScreenState extends ConsumerState<PuzzlePlayScreen> {
       );
   }
 
-  Future<void> _showSolvedSheet() async {
+  Future<void> _showSolvedSheet(int earnedCoins) async {
     final s = S.of(context);
     final all = PuzzleSet.all;
     final index = all.indexWhere((p) => p.id == _puzzle.id);

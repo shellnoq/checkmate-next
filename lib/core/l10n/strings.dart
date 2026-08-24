@@ -118,6 +118,14 @@ class S {
   String get categoryClosed => _('Kapalı Oyunlar', 'Closed Games');
   String get categoryFlank => _('Kanat Açılışları', 'Flank Openings');
 
+  // Başarımlar ve coin
+  String get achievements => _('Başarımlar', 'Achievements');
+  String get coins => _('Coin', 'Coins');
+  String achievementUnlocked(String name, int coins) =>
+      _('Başarım: $name (+$coins coin)', 'Achievement: $name (+$coins coins)');
+  String coinsEarned(int coins) => _('+$coins coin', '+$coins coins');
+  String get lockedTag => _('Kilitli', 'Locked');
+
   // Bulmacalar
   String get puzzles => _('Bulmacalar', 'Puzzles');
   String mateInN(int n) => _('$n hamlede mat', 'Mate in $n');

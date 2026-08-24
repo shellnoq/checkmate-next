@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartchess/dartchess.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +16,8 @@ import '../../domain/game_controller.dart';
 import '../../domain/match/match_protocol.dart';
 import '../../domain/model/game_result.dart';
 import '../../domain/model/move_record.dart';
+import '../../domain/economy/achievements.dart';
+import '../../domain/economy/coin_service.dart';
 import '../../domain/openings/opening_book.dart';
 import '../board/chess_board.dart';
 import 'widgets/evaluation_bar.dart';
@@ -148,9 +152,12 @@ class _GameScreenState extends ConsumerState<GameScreen>
     );
   }
 
+  int _earnedCoins = 0;
+
   void _onGameEnded(GameResult result) {
     _flushPlaytime();
     _persistResult(result);
+    unawaited(_awardCoins(result));
     final localWon =
         result.winner != null &&
         widget.config.kind == MatchKind.engine &&
@@ -188,6 +195,35 @@ class _GameScreenState extends ConsumerState<GameScreen>
       'pgn': controller.toPgn(),
       'finalFen': controller.position.fen,
     });
+  }
+
+  /// Oyun ödülünü ekler ve yeni başarımları duyurur. Kayda değmeyen
+  /// (hamlesiz) oyun ödül almaz.
+  Future<void> _awardCoins(GameResult result) async {
+    final controller = _controller;
+    if (controller == null || !controller.shouldRecord) return;
+    if (widget.config.kind == MatchKind.engine) {
+      final won = result.winner == widget.config.localSide;
+      _earnedCoins = CoinService.gameReward(
+        won: won,
+        draw: result.isDraw,
+        difficultyTier: widget.config.difficulty?.tier ?? 1,
+        moveCount: controller.moves.length,
+      );
+      await CoinService.add(_earnedCoins);
+    }
+    final unlocked = await AchievementService.checkAll();
+    if (!mounted || unlocked.isEmpty) return;
+    final s = S.of(context);
+    for (final achievement in unlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            s.achievementUnlocked(achievement.label(s.tr), achievement.coins),
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _showPromotionSheet() async {

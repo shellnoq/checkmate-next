@@ -7,6 +7,7 @@ import '../../app/providers/settings.dart';
 import '../../core/l10n/strings.dart';
 import '../../core/storage/app_storage.dart';
 import '../../core/utils/app_version.dart';
+import '../../domain/economy/coin_service.dart';
 import '../board/piece_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -73,6 +74,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           onPressed: () => context.push('/puzzles'),
                           icon: const Icon(Icons.extension_outlined),
                           label: Text(s.puzzles),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/achievements'),
+                          icon: const Icon(Icons.emoji_events_outlined),
+                          label: Text(
+                            '${s.achievements} · ${CoinService.balance}',
+                          ),
                         ),
                       ),
                     ],

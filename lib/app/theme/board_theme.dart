@@ -101,7 +101,58 @@ class BoardTheme {
     coordinateOnDark: Color(0xFFF2F0EB),
   );
 
-  static const all = <BoardTheme>[walnut, tournament, slate, midnight, marble];
+  /// Uzay paketi: Ay yüzeyi grileri.
+  static const lunar = BoardTheme(
+    id: 'lunar',
+    trName: 'Ay Yüzeyi',
+    enName: 'Lunar',
+    light: Color(0xFFC9CDD4),
+    dark: Color(0xFF565E6C),
+    lastMove: Color(0x667FA8E0),
+    selection: Color(0x8852B788),
+    check: Color(0x99E5484D),
+    coordinateOnLight: Color(0xFF565E6C),
+    coordinateOnDark: Color(0xFFC9CDD4),
+  );
+
+  /// Orman paketi: yosun ve toprak.
+  static const jungle = BoardTheme(
+    id: 'jungle',
+    trName: 'Orman',
+    enName: 'Jungle',
+    light: Color(0xFFD9E4C0),
+    dark: Color(0xFF5F7F4A),
+    lastMove: Color(0x88E7D96B),
+    selection: Color(0x8842A05C),
+    check: Color(0x99D64545),
+    coordinateOnLight: Color(0xFF5F7F4A),
+    coordinateOnDark: Color(0xFFD9E4C0),
+  );
+
+  /// Antik Mısır paketi: kum ve altın.
+  static const desert = BoardTheme(
+    id: 'desert',
+    trName: 'Çöl',
+    enName: 'Desert',
+    light: Color(0xFFEFDCA8),
+    dark: Color(0xFFB98A44),
+    lastMove: Color(0x77E8B33C),
+    selection: Color(0x8850A070),
+    check: Color(0x99D14B40),
+    coordinateOnLight: Color(0xFF8F6A32),
+    coordinateOnDark: Color(0xFFF3E5BE),
+  );
+
+  static const all = <BoardTheme>[
+    walnut,
+    tournament,
+    slate,
+    midnight,
+    marble,
+    lunar,
+    jungle,
+    desert,
+  ];
 
   static BoardTheme fromId(String? id) =>
       all.firstWhere((t) => t.id == id, orElse: () => walnut);

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
@@ -27,10 +29,15 @@ class SoundService {
   };
 
   final Map<Sfx, AudioPlayer> _players = {};
+  AudioPlayer? _music;
+  String? _musicAsset;
   bool _ready = false;
 
   bool enabled = true;
   bool hapticsEnabled = true;
+
+  /// Fon müziği düzeyi (0-1). Sıfırsa müzik hiç başlamaz.
+  double musicVolume = 0;
 
   Future<void> preload() async {
     if (_ready) return;
@@ -58,6 +65,40 @@ class SoundService {
     }
   }
 
+  /// Verilen parçayı döngüde çalar. Aynı parça zaten çalıyorsa yalnızca ses
+  /// düzeyini tazeler; `asset` boşsa ya da düzey sıfırsa müziği durdurur.
+  Future<void> playMusic(String? asset) async {
+    if (asset == null || musicVolume <= 0) {
+      await stopMusic();
+      return;
+    }
+    try {
+      if (_musicAsset == asset && _music != null) {
+        await _music!.setVolume(musicVolume);
+        return;
+      }
+      await stopMusic();
+      final player = AudioPlayer();
+      await player.setAsset(asset);
+      await player.setLoopMode(LoopMode.one);
+      await player.setVolume(musicVolume);
+      _music = player;
+      _musicAsset = asset;
+      unawaited(player.play());
+    } catch (e) {
+      debugPrint('Müzik çalınamadı ($asset): $e');
+    }
+  }
+
+  Future<void> stopMusic() async {
+    final player = _music;
+    _music = null;
+    _musicAsset = null;
+    try {
+      await player?.dispose();
+    } catch (_) {}
+  }
+
   void haptic([HapticStrength strength = HapticStrength.light]) {
     if (!hapticsEnabled) return;
     switch (strength) {
@@ -71,6 +112,7 @@ class SoundService {
   }
 
   Future<void> dispose() async {
+    await stopMusic();
     for (final player in _players.values) {
       await player.dispose();
     }

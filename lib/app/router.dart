@@ -12,6 +12,7 @@ import '../features/puzzles/puzzle_play_screen.dart';
 import '../features/puzzles/puzzles_screen.dart';
 import '../features/play/new_game_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/themes/themes_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -60,6 +61,7 @@ final appRouter = GoRouter(
       path: '/parent',
       builder: (context, state) => const ParentAreaScreen(),
     ),
+    GoRoute(path: '/themes', builder: (context, state) => const ThemesScreen()),
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),

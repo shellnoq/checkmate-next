@@ -118,6 +118,16 @@ class S {
   String get categoryClosed => _('Kapalı Oyunlar', 'Closed Games');
   String get categoryFlank => _('Kanat Açılışları', 'Flank Openings');
 
+  // Tema paketleri
+  String get themePacks => _('Tema Paketleri', 'Theme Packs');
+  String get owned => _('Sahipsin', 'Owned');
+  String get active => _('Etkin', 'Active');
+  String get select => _('Seç', 'Select');
+  String buyFor(int price) =>
+      _('$price coin ile aç', 'Unlock for $price coins');
+  String get notEnoughCoins => _('Yeterli coin yok', 'Not enough coins');
+  String get musicVolume => _('Fon müziği', 'Background music');
+
   // Başarımlar ve coin
   String get achievements => _('Başarımlar', 'Achievements');
   String get coins => _('Coin', 'Coins');

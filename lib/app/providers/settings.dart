@@ -7,6 +7,7 @@ import '../../domain/model/difficulty.dart';
 import '../../domain/model/time_control.dart';
 import '../../features/board/piece_set.dart';
 import '../theme/board_theme.dart';
+import '../theme/theme_packs.dart';
 
 /// Kullanıcı tercihleri.
 @immutable
@@ -28,6 +29,12 @@ class AppSettings {
   /// Günlük oyun süresi sınırı. `Duration.zero` ise sınır yoktur.
   final Duration dailyLimit;
 
+  /// Etkin tema paketi.
+  final ThemePack themePack;
+
+  /// Fon müziği düzeyi (0-1); 0 kapalı.
+  final double musicVolume;
+
   const AppSettings({
     required this.locale,
     required this.themeMode,
@@ -43,6 +50,8 @@ class AppSettings {
     required this.lastTimeControl,
     required this.ageGroup,
     required this.dailyLimit,
+    required this.themePack,
+    required this.musicVolume,
   });
 
   bool get turkish => locale.languageCode == 'tr';
@@ -62,6 +71,8 @@ class AppSettings {
     TimeControl? lastTimeControl,
     AgeGroup? ageGroup,
     Duration? dailyLimit,
+    ThemePack? themePack,
+    double? musicVolume,
   }) => AppSettings(
     locale: locale ?? this.locale,
     themeMode: themeMode ?? this.themeMode,
@@ -77,6 +88,8 @@ class AppSettings {
     lastTimeControl: lastTimeControl ?? this.lastTimeControl,
     ageGroup: ageGroup ?? this.ageGroup,
     dailyLimit: dailyLimit ?? this.dailyLimit,
+    themePack: themePack ?? this.themePack,
+    musicVolume: musicVolume ?? this.musicVolume,
   );
 
   static AppSettings load() => AppSettings(
@@ -104,6 +117,10 @@ class AppSettings {
     ),
     ageGroup: AgeGroup.fromId(AppStorage.get<String>('ageGroup', 'adult')),
     dailyLimit: Duration(minutes: AppStorage.get<int>('dailyLimitMinutes', 0)),
+    themePack: ThemePacks.fromId(
+      AppStorage.get<String>('themePack', 'classic'),
+    ),
+    musicVolume: (AppStorage.get<double>('musicVolume', 0.0)).clamp(0.0, 1.0),
   );
 }
 
@@ -166,6 +183,24 @@ class SettingsController extends StateNotifier<AppSettings> {
     state = state.copyWith(ageGroup: group, pieceSet: group.suggestedPieceSet);
     await AppStorage.set('ageGroup', group.id);
     await AppStorage.set('pieceSet', group.suggestedPieceSet.id);
+  }
+
+  /// Tema paketini uygular: tahta, taş takımı ve arka plan birlikte değişir.
+  Future<void> setThemePack(ThemePack pack) async {
+    state = state.copyWith(
+      themePack: pack,
+      boardTheme: pack.boardTheme,
+      pieceSet: pack.pieceSet,
+    );
+    await AppStorage.set('themePack', pack.id);
+    await AppStorage.set('boardTheme', pack.boardTheme.id);
+    await AppStorage.set('pieceSet', pack.pieceSet.id);
+  }
+
+  Future<void> setMusicVolume(double volume) async {
+    final clamped = volume.clamp(0.0, 1.0);
+    state = state.copyWith(musicVolume: clamped);
+    await AppStorage.set('musicVolume', clamped);
   }
 
   /// Günlük süre sınırını ayarlar. Sıfır dakika sınırı kaldırır.

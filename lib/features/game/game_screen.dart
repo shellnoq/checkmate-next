@@ -19,7 +19,9 @@ import '../../domain/model/move_record.dart';
 import '../../domain/economy/achievements.dart';
 import '../../domain/economy/coin_service.dart';
 import '../../domain/openings/opening_book.dart';
+import '../../app/theme/theme_packs.dart';
 import '../board/chess_board.dart';
+import '../board/game_background.dart';
 import 'widgets/evaluation_bar.dart';
 import 'widgets/move_table.dart';
 import 'widgets/player_bar.dart';
@@ -92,8 +94,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
     final settings = ref.read(settingsProvider);
     SoundService.instance
       ..enabled = settings.soundEnabled
-      ..hapticsEnabled = settings.hapticsEnabled;
+      ..hapticsEnabled = settings.hapticsEnabled
+      ..musicVolume = settings.musicVolume;
     unawaitedPreload();
+    unawaited(SoundService.instance.playMusic(settings.themePack.musicAsset));
 
     try {
       if (widget.config.kind == MatchKind.engine) {
@@ -338,6 +342,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   @override
   void dispose() {
+    unawaited(SoundService.instance.stopMusic());
     _flushPlaytime();
     WidgetsBinding.instance.removeObserver(this);
     _controller?.removeListener(_onControllerChanged);
@@ -408,193 +413,204 @@ class _GameScreenState extends ConsumerState<GameScreen>
         }
         if (mounted) router.pop();
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(_title(s, settings.turkish)),
-          actions: [
-            IconButton(
-              tooltip: s.flipBoard,
-              onPressed: () => setState(() => _boardFlipped = !_boardFlipped),
-              icon: const Icon(Icons.swap_vert),
-            ),
-            PopupMenuButton<String>(
-              onSelected: (value) async {
-                final messenger = ScaffoldMessenger.of(context);
-                switch (value) {
-                  case 'draw':
-                    await controller.offerDraw();
-                  case 'claim':
-                    if (!controller.claimDrawIfEligible()) {
-                      messenger.showSnackBar(
-                        SnackBar(content: Text(s.drawDeclined)),
-                      );
-                    }
-                  case 'pgn':
-                    await Clipboard.setData(
-                      ClipboardData(text: controller.toPgn()),
-                    );
-                    messenger.showSnackBar(
-                      SnackBar(content: Text(s.pgnCopied)),
-                    );
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(value: 'draw', child: Text(s.offerDraw)),
-                PopupMenuItem(value: 'claim', child: Text(s.claimDraw)),
-                PopupMenuItem(value: 'pgn', child: Text(s.copyPgn)),
-              ],
-            ),
-          ],
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              // Oyuncu çubukları tahtaya bitişik durur; üçü birlikte kalan
-              // alanda ortalanır. Aksi hâlde çubuklar ekranın uçlarına
-              // yapışır ve tahtanın çevresinde geniş boşluk kalır.
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    // Ad, alt yazı ("Düşünüyor…") ve alınan taşlar satırı
-                    // üst üste geldiğinde 62 piksel yetmiyordu.
-                    const barHeight = 74.0;
-                    final evalWidth = settings.showEvaluation ? 22.0 : 0.0;
-                    // Tahta grubu ekranın en çok %72'sini alır; kalan alan
-                    // notasyon paneline bırakılır. Kısa ekranlarda tahta
-                    // küçülür, panel de kendiliğinden daralır.
-                    final groupHeight = constraints.maxHeight * 0.72;
-                    final available = groupHeight - barHeight * 2;
-                    final boardSize = (constraints.maxWidth - evalWidth - 16)
-                        .clamp(
-                          0.0,
-                          available > 0 ? available : constraints.maxHeight,
+      child: GameBackground(
+        style: settings.themePack.background,
+        child: Scaffold(
+          backgroundColor: settings.themePack.background == BackgroundStyle.none
+              ? null
+              : Colors.transparent,
+          appBar: AppBar(
+            title: Text(_title(s, settings.turkish)),
+            actions: [
+              IconButton(
+                tooltip: s.flipBoard,
+                onPressed: () => setState(() => _boardFlipped = !_boardFlipped),
+                icon: const Icon(Icons.swap_vert),
+              ),
+              PopupMenuButton<String>(
+                onSelected: (value) async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  switch (value) {
+                    case 'draw':
+                      await controller.offerDraw();
+                    case 'claim':
+                      if (!controller.claimDrawIfEligible()) {
+                        messenger.showSnackBar(
+                          SnackBar(content: Text(s.drawDeclined)),
                         );
+                      }
+                    case 'pgn':
+                      await Clipboard.setData(
+                        ClipboardData(text: controller.toPgn()),
+                      );
+                      messenger.showSnackBar(
+                        SnackBar(content: Text(s.pgnCopied)),
+                      );
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(value: 'draw', child: Text(s.offerDraw)),
+                  PopupMenuItem(value: 'claim', child: Text(s.claimDraw)),
+                  PopupMenuItem(value: 'pgn', child: Text(s.copyPgn)),
+                ],
+              ),
+            ],
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Oyuncu çubukları tahtaya bitişik durur; üçü birlikte kalan
+                // alanda ortalanır. Aksi hâlde çubuklar ekranın uçlarına
+                // yapışır ve tahtanın çevresinde geniş boşluk kalır.
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      // Ad, alt yazı ("Düşünüyor…") ve alınan taşlar satırı
+                      // üst üste geldiğinde 62 piksel yetmiyordu.
+                      const barHeight = 74.0;
+                      final evalWidth = settings.showEvaluation ? 22.0 : 0.0;
+                      // Tahta grubu ekranın en çok %72'sini alır; kalan alan
+                      // notasyon paneline bırakılır. Kısa ekranlarda tahta
+                      // küçülür, panel de kendiliğinden daralır.
+                      final groupHeight = constraints.maxHeight * 0.72;
+                      final available = groupHeight - barHeight * 2;
+                      final boardSize = (constraints.maxWidth - evalWidth - 16)
+                          .clamp(
+                            0.0,
+                            available > 0 ? available : constraints.maxHeight,
+                          );
 
-                    return Column(
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              height: barHeight,
-                              width: boardSize + evalWidth + 16,
-                              child: PlayerBar(
-                                name: _nameOf(topSide, s),
-                                side: topSide,
-                                captured: controller.capturedBy(topSide),
-                                materialAdvantage: _advantageOf(
-                                  topSide,
-                                  controller,
+                      return Column(
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: barHeight,
+                                width: boardSize + evalWidth + 16,
+                                child: PlayerBar(
+                                  name: _nameOf(topSide, s),
+                                  side: topSide,
+                                  captured: controller.capturedBy(topSide),
+                                  materialAdvantage: _advantageOf(
+                                    topSide,
+                                    controller,
+                                  ),
+                                  pieceSet: settings.pieceSet,
+                                  isActive:
+                                      controller.position.turn == topSide &&
+                                      controller.phase == GamePhase.playing,
+                                  remaining:
+                                      widget.config.timeControl.isUnlimited
+                                      ? null
+                                      : controller.clock.remainingOf(topSide),
+                                  subtitle:
+                                      controller.opponentThinking &&
+                                          controller.position.turn == topSide
+                                      ? s.thinking
+                                      : null,
                                 ),
-                                pieceSet: settings.pieceSet,
-                                isActive:
-                                    controller.position.turn == topSide &&
-                                    controller.phase == GamePhase.playing,
-                                remaining: widget.config.timeControl.isUnlimited
-                                    ? null
-                                    : controller.clock.remainingOf(topSide),
-                                subtitle:
-                                    controller.opponentThinking &&
-                                        controller.position.turn == topSide
-                                    ? s.thinking
-                                    : null,
                               ),
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (settings.showEvaluation) ...[
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (settings.showEvaluation) ...[
+                                    SizedBox(
+                                      height: boardSize,
+                                      child: EvaluationBar(
+                                        line: controller.evaluation,
+                                        sideToMove: controller.position.turn,
+                                        orientation: orientation,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                  ],
                                   SizedBox(
+                                    width: boardSize,
                                     height: boardSize,
-                                    child: EvaluationBar(
-                                      line: controller.evaluation,
-                                      sideToMove: controller.position.turn,
+                                    child: ChessBoard(
+                                      position: displayed,
                                       orientation: orientation,
+                                      boardTheme: settings.boardTheme,
+                                      pieceSet: settings.pieceSet,
+                                      legalDestinations:
+                                          controller.destinationsForSelected,
+                                      selectedSquare: controller.selectedSquare,
+                                      lastMove: controller.lastMoveSquares,
+                                      checkedSquare:
+                                          controller.checkedKingSquare,
+                                      hintMove: _hintSquares(controller),
+                                      premoveSquares: controller.premoveSquares,
+                                      interactive:
+                                          controller.phase == GamePhase.playing,
+                                      showCoordinates: settings.showCoordinates,
+                                      showLegalMoves: settings.showLegalMoves,
+                                      onSquareTap: controller.selectSquare,
+                                      onMove: controller.moveByDrag,
                                     ),
                                   ),
-                                  const SizedBox(width: 6),
                                 ],
-                                SizedBox(
-                                  width: boardSize,
-                                  height: boardSize,
-                                  child: ChessBoard(
-                                    position: displayed,
-                                    orientation: orientation,
-                                    boardTheme: settings.boardTheme,
-                                    pieceSet: settings.pieceSet,
-                                    legalDestinations:
-                                        controller.destinationsForSelected,
-                                    selectedSquare: controller.selectedSquare,
-                                    lastMove: controller.lastMoveSquares,
-                                    checkedSquare: controller.checkedKingSquare,
-                                    hintMove: _hintSquares(controller),
-                                    premoveSquares: controller.premoveSquares,
-                                    interactive:
-                                        controller.phase == GamePhase.playing,
-                                    showCoordinates: settings.showCoordinates,
-                                    showLegalMoves: settings.showLegalMoves,
-                                    onSquareTap: controller.selectSquare,
-                                    onMove: controller.moveByDrag,
+                              ),
+                              SizedBox(
+                                height: barHeight,
+                                width: boardSize + evalWidth + 16,
+                                child: PlayerBar(
+                                  name: _nameOf(bottomSide, s),
+                                  side: bottomSide,
+                                  captured: controller.capturedBy(bottomSide),
+                                  materialAdvantage: _advantageOf(
+                                    bottomSide,
+                                    controller,
                                   ),
+                                  pieceSet: settings.pieceSet,
+                                  isActive:
+                                      controller.position.turn == bottomSide &&
+                                      controller.phase == GamePhase.playing,
+                                  remaining:
+                                      widget.config.timeControl.isUnlimited
+                                      ? null
+                                      : controller.clock.remainingOf(
+                                          bottomSide,
+                                        ),
                                 ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: barHeight,
-                              width: boardSize + evalWidth + 16,
-                              child: PlayerBar(
-                                name: _nameOf(bottomSide, s),
-                                side: bottomSide,
-                                captured: controller.capturedBy(bottomSide),
-                                materialAdvantage: _advantageOf(
-                                  bottomSide,
-                                  controller,
-                                ),
-                                pieceSet: settings.pieceSet,
-                                isActive:
-                                    controller.position.turn == bottomSide &&
-                                    controller.phase == GamePhase.playing,
-                                remaining: widget.config.timeControl.isUnlimited
-                                    ? null
-                                    : controller.clock.remainingOf(bottomSide),
+                              ),
+                            ],
+                          ),
+                          const Divider(height: 13, indent: 16, endIndent: 16),
+                          if (OpeningBook.identify([
+                                for (final m in controller.moves) m.uci,
+                              ])
+                              case final opening?)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                '${opening.eco} · ${opening.label(s.tr)}',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
                               ),
                             ),
-                          ],
-                        ),
-                        const Divider(height: 13, indent: 16, endIndent: 16),
-                        if (OpeningBook.identify([
-                              for (final m in controller.moves) m.uci,
-                            ])
-                            case final opening?)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Text(
-                              '${opening.eco} · ${opening.label(s.tr)}',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
+                          Expanded(
+                            child: MoveTable(
+                              moves: controller.moves,
+                              currentIndex: controller.browseIndex,
+                              onSelect: controller.browseTo,
+                              emptyHint: s.moves,
                             ),
                           ),
-                        Expanded(
-                          child: MoveTable(
-                            moves: controller.moves,
-                            currentIndex: controller.browseIndex,
-                            onSelect: controller.browseTo,
-                            emptyHint: s.moves,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-              const Divider(height: 1),
-              _ActionBar(controller: controller, strings: s),
-            ],
+                const Divider(height: 1),
+                _ActionBar(controller: controller, strings: s),
+              ],
+            ),
           ),
         ),
       ),

@@ -217,6 +217,16 @@ class SettingsScreen extends ConsumerWidget {
               if (value) SoundService.instance.play(Sfx.move);
             },
           ),
+          ListTile(
+            title: Text(s.musicVolume),
+            subtitle: Slider(
+              value: settings.musicVolume,
+              onChanged: (value) {
+                controller.setMusicVolume(value);
+                SoundService.instance.musicVolume = value;
+              },
+            ),
+          ),
           SwitchListTile(
             title: Text(s.haptics),
             value: settings.hapticsEnabled,

@@ -21,17 +21,43 @@ void main() {
   group('CoinService', () {
     test('oyun ödülü: kısa galibiyet az, uzun ve zor galibiyet çok verir', () {
       final cheap = CoinService.gameReward(
-          won: true, draw: false, difficultyTier: 8, moveCount: 7);
+        won: true,
+        draw: false,
+        difficultyTier: 8,
+        moveCount: 7,
+      );
       final earned = CoinService.gameReward(
-          won: true, draw: false, difficultyTier: 8, moveCount: 40);
+        won: true,
+        draw: false,
+        difficultyTier: 8,
+        moveCount: 40,
+      );
       final easy = CoinService.gameReward(
-          won: true, draw: false, difficultyTier: 1, moveCount: 40);
+        won: true,
+        draw: false,
+        difficultyTier: 1,
+        moveCount: 40,
+      );
       expect(cheap, 5);
       expect(earned, greaterThan(easy));
-      expect(CoinService.gameReward(
-          won: false, draw: true, difficultyTier: 3, moveCount: 30), 3);
-      expect(CoinService.gameReward(
-          won: false, draw: false, difficultyTier: 3, moveCount: 30), 1);
+      expect(
+        CoinService.gameReward(
+          won: false,
+          draw: true,
+          difficultyTier: 3,
+          moveCount: 30,
+        ),
+        3,
+      );
+      expect(
+        CoinService.gameReward(
+          won: false,
+          draw: false,
+          difficultyTier: 3,
+          moveCount: 30,
+        ),
+        1,
+      );
     });
 
     test('bakiye ekleme ve harcama', () async {
@@ -59,8 +85,10 @@ void main() {
       final ids = first.map((a) => a.id).toList();
       expect(ids, contains('first_win'));
       expect(ids, contains('beat_club'));
-      expect(CoinService.balance,
-          first.fold<int>(0, (sum, a) => sum + a.coins));
+      expect(
+        CoinService.balance,
+        first.fold<int>(0, (sum, a) => sum + a.coins),
+      );
 
       // İkinci denetim aynı başarımları yeniden açmaz.
       final second = await AchievementService.checkAll();

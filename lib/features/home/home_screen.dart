@@ -90,6 +90,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/themes'),
+                          icon: const Icon(Icons.palette_outlined),
+                          label: Text(s.themePacks),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),

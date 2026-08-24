@@ -118,6 +118,19 @@ class S {
   String get categoryClosed => _('Kapalı Oyunlar', 'Closed Games');
   String get categoryFlank => _('Kanat Açılışları', 'Flank Openings');
 
+  // Bulmacalar
+  String get puzzles => _('Bulmacalar', 'Puzzles');
+  String mateInN(int n) => _('$n hamlede mat', 'Mate in $n');
+  String get whiteToPlay => _('Beyaz oynar', 'White to play');
+  String get blackToPlay => _('Siyah oynar', 'Black to play');
+  String get wrongMove =>
+      _('Bu hamle matı kaçırıyor', 'That move lets the mate slip');
+  String get tryAgain => _('Tekrar Dene', 'Try Again');
+  String get puzzleSolvedTitle => _('Aferin!', 'Well done!');
+  String get nextPuzzle => _('Sonraki', 'Next');
+  String get backToList => _('Listeye Dön', 'Back to List');
+  String get solvedTag => _('Çözüldü', 'Solved');
+
   // Ebeveyn bölümü
   String get parentArea => _('Ebeveyn Bölümü', 'Parent Area');
   String get parentAreaSub =>

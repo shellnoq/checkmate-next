@@ -7,6 +7,8 @@ import '../features/history/replay_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/openings/openings_screen.dart';
 import '../features/parent/parent_area_screen.dart';
+import '../features/puzzles/puzzle_play_screen.dart';
+import '../features/puzzles/puzzles_screen.dart';
 import '../features/play/new_game_screen.dart';
 import '../features/settings/settings_screen.dart';
 
@@ -39,6 +41,15 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/openings',
       builder: (context, state) => const OpeningsScreen(),
+    ),
+    GoRoute(
+      path: '/puzzles',
+      builder: (context, state) => const PuzzlesScreen(),
+    ),
+    GoRoute(
+      path: '/puzzle',
+      builder: (context, state) =>
+          PuzzlePlayScreen(puzzleId: state.extra! as String),
     ),
     GoRoute(
       path: '/parent',

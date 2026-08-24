@@ -58,10 +58,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const SizedBox(height: 24),
                   _StatsPanel(turkish: settings.turkish),
                   const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: () => context.push('/openings'),
-                    icon: const Icon(Icons.auto_stories_outlined),
-                    label: Text(s.openingLibrary),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/openings'),
+                          icon: const Icon(Icons.auto_stories_outlined),
+                          label: Text(s.openingLibrary),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/puzzles'),
+                          icon: const Icon(Icons.extension_outlined),
+                          label: Text(s.puzzles),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   Row(

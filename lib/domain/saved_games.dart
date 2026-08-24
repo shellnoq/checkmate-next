@@ -75,8 +75,7 @@ class SavedGameStore {
   /// Kayıtları en yeniden eskiye sıralı döndürür.
   static List<SavedGame> list() {
     final games = <SavedGame>[
-      for (final level in DifficultyLevel.values)
-        if (forLevel(level.id) case final game?) game,
+      for (final level in DifficultyLevel.values) ?forLevel(level.id),
     ]..sort((a, b) => b.savedAt.compareTo(a.savedAt));
     return games;
   }

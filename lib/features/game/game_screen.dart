@@ -13,6 +13,7 @@ import '../../domain/game_controller.dart';
 import '../../domain/match/match_protocol.dart';
 import '../../domain/model/game_result.dart';
 import '../../domain/model/move_record.dart';
+import '../../domain/openings/opening_book.dart';
 import '../board/chess_board.dart';
 import 'widgets/evaluation_bar.dart';
 import 'widgets/move_table.dart';
@@ -181,6 +182,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
       'timeControl': widget.config.timeControl.id,
       'result': result.toJson(),
       'moveCount': controller.moves.length,
+      'uci': [for (final m in controller.moves) m.uci],
+      'startingFen': widget.config.startingFen,
       'pgn': controller.toPgn(),
       'finalFen': controller.position.fen,
     });
@@ -518,7 +521,24 @@ class _GameScreenState extends ConsumerState<GameScreen>
                             ),
                           ],
                         ),
-                        const Divider(height: 17, indent: 16, endIndent: 16),
+                        const Divider(height: 13, indent: 16, endIndent: 16),
+                        if (OpeningBook.identify([
+                              for (final m in controller.moves) m.uci,
+                            ])
+                            case final opening?)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(
+                              '${opening.eco} · ${opening.label(s.tr)}',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                            ),
+                          ),
                         Expanded(
                           child: MoveTable(
                             moves: controller.moves,

@@ -28,12 +28,12 @@ void main() {
   });
 
   Widget harness(MatchConfig config) => ProviderScope(
-        overrides: [chessEngineProvider.overrideWithValue(FakeEngine())],
-        child: MaterialApp(
-          locale: const Locale('tr'),
-          home: GameScreen(config: config),
-        ),
-      );
+    overrides: [chessEngineProvider.overrideWithValue(FakeEngine())],
+    child: MaterialApp(
+      locale: const Locale('tr'),
+      home: GameScreen(config: config),
+    ),
+  );
 
   testWidgets('saat işlerken terfi penceresi tek kez açılır', (tester) async {
     // Beyaz piyon a7'de; a8'e giderek terfi eder. Süreli oyun seçildi ki
@@ -56,10 +56,12 @@ void main() {
     Future<void> tapSquare(Square square) async {
       final rect = tester.getRect(board);
       final size = rect.width / 8;
-      await tester.tapAt(Offset(
-        rect.left + (square.file.toInt() + 0.5) * size,
-        rect.top + (7 - square.rank.toInt() + 0.5) * size,
-      ));
+      await tester.tapAt(
+        Offset(
+          rect.left + (square.file.toInt() + 0.5) * size,
+          rect.top + (7 - square.rank.toInt() + 0.5) * size,
+        ),
+      );
       await tester.pump(const Duration(milliseconds: 120));
     }
 

@@ -52,17 +52,11 @@ Kapalı testin ilk turundan üç kullanıcının istekleri; boyuta göre gruplan
 - Sürükle-bırak zaten vardı (taşa basılı tutup kaydırınca taşınıyor); kırık
   görünen cihaz olursa ayrıntı istenecek.
 - "Try again" karşılığı olan Yeniden Oyna düğmesi zaten mevcut.
+- Açılış kütüphanesi (65+ satır, kategorili, tahtada izlenebilir), maç tekrarı
+  ekranı ve motorlu hamle kalitesi analizi (kitap/yıldız/tik/soru/çarpı).
+  Canlı oyunda da açılış adı gösteriliyor.
 
 ### Orta boy
-- **Maç tekrarı:** arşivdeki oyunu tahtada adım adım oynatma. Tahta gezinme
-  altyapısı hazır; arşive UCI listesi eklemek ve bir izleme ekranı yazmak
-  gerekiyor.
-- **Hamle kalitesi analizi:** tekrar ekranında her hamleye simge (kitap,
-  yıldız, tik, soru işareti, çarpı). Motor her pozisyonu sabit derinlikte
-  değerlendirip düşüşe göre sınıflar; kitap tespiti için küçük bir açılış
-  tablosu gerekir.
-- **Açılış kütüphanesi:** dünya açılış ve savunmalarının adları; oyun sırasında
-  "İtalyan Açılışı" gibi gösterim. Aynı tablo kitap hamlesi tespitini de besler.
 - **Ön hamle (premove):** sıra rakipteyken sonraki hamleyi çizip sıra gelince
   otomatik oynatma.
 - **Bulmacalar:** N hamlede mat / kazanç. Veri seti bulunmalı ya da motorla

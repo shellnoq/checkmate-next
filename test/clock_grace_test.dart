@@ -7,9 +7,7 @@ import 'package:checkmate_next/domain/model/time_control.dart';
 import 'support/fake_transport.dart';
 
 void main() {
-  GameController build({
-    Duration grace = const Duration(milliseconds: 120),
-  }) =>
+  GameController build({Duration grace = const Duration(milliseconds: 120)}) =>
       GameController(
         config: MatchConfig(
           matchId: 'test',
@@ -27,8 +25,11 @@ void main() {
       final controller = build();
       await controller.start();
 
-      expect(controller.clock.isRunning, isFalse,
-          reason: 'oyuncu daha taşlara bakarken süre erimemeli');
+      expect(
+        controller.clock.isRunning,
+        isFalse,
+        reason: 'oyuncu daha taşlara bakarken süre erimemeli',
+      );
 
       await Future<void>.delayed(const Duration(milliseconds: 200));
       expect(controller.clock.isRunning, isTrue);
@@ -46,13 +47,14 @@ void main() {
       expect(controller.clock.isRunning, isTrue);
       expect(controller.clock.activeSide, Side.black);
       // Beyaz henüz süre kaybetmedi: pay içinde oynadı.
-      expect(controller.clock.remainingOf(Side.white),
-          TimeControl.blitz5.initial);
+      expect(
+        controller.clock.remainingOf(Side.white),
+        TimeControl.blitz5.initial,
+      );
       controller.dispose();
     });
 
-    test('pay zamanlayıcısı hamleden sonra saati yeniden kurcalamaz',
-        () async {
+    test('pay zamanlayıcısı hamleden sonra saati yeniden kurcalamaz', () async {
       final controller = build(grace: const Duration(milliseconds: 80));
       await controller.start();
 

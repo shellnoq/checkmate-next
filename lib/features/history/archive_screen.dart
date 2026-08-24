@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/providers/settings.dart';
 import '../../core/l10n/strings.dart';
@@ -159,6 +160,15 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
                       );
                     },
                   ),
+                  onTap: () {
+                    if (game['uci'] is List) {
+                      context.push('/replay', extra: game);
+                    } else {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(s.noReplayData)));
+                    }
+                  },
                   onLongPress: () async {
                     await AppStorage.deleteArchivedGame(
                       game['_key']! as String,

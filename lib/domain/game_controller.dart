@@ -10,6 +10,7 @@ import 'match/match_protocol.dart';
 import 'match/match_transport.dart';
 import 'model/game_result.dart';
 import 'model/move_record.dart';
+import 'model/uci_standard.dart';
 
 enum GamePhase { idle, playing, finished }
 
@@ -311,28 +312,8 @@ class GameController extends ChangeNotifier {
     );
   }
 
-  /// Rok hamlesini standart UCI biçimine çevirir.
-  ///
-  /// `dartchess` rok için hem şah-iki-kare (`e1g1`) hem şah-kaleye (`e1h1`)
-  /// gösterimini geçerli sayar. UCI protokolü ve online kablo biçimi ise
-  /// (Chess960 dışında) yalnızca birincisini tanır; kullanıcı kaleye dokunarak
-  /// rok yaptığında hamlenin motora yanlış gitmemesi için burada dönüştürülür.
-  String _toStandardUci(NormalMove move) {
-    final piece = _position.board.pieceAt(move.from);
-    if (piece == null || piece.role != Role.king) return move.uci;
-    final target = _position.board.pieceAt(move.to);
-    if (target == null ||
-        target.role != Role.rook ||
-        target.color != piece.color) {
-      return move.uci;
-    }
-    final kingSide = move.to.file > move.from.file;
-    final destination = Square.fromCoords(
-      File(kingSide ? 6 : 2),
-      move.from.rank,
-    );
-    return NormalMove(from: move.from, to: destination).uci;
-  }
+  String _toStandardUci(NormalMove move) =>
+      standardizeCastlingUci(_position, move);
 
   /// Hamleyi kural katmanına uygular, kaydeder ve oyun sonu kontrolü yapar.
   bool _applyMove(NormalMove uiMove) {

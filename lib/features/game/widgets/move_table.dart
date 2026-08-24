@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../domain/analysis/game_analyzer.dart';
 import '../../../domain/model/move_record.dart';
+import '../../history/quality_style.dart';
 
 /// Notasyon paneli: hamleleri sıra numarasıyla iki sütun hâlinde listeler.
 ///
@@ -13,6 +15,7 @@ class MoveTable extends StatefulWidget {
     required this.currentIndex,
     required this.onSelect,
     this.emptyHint,
+    this.qualityOf,
   });
 
   final List<MoveRecord> moves;
@@ -24,6 +27,9 @@ class MoveTable extends StatefulWidget {
 
   /// Hiç hamle yokken gösterilecek metin.
   final String? emptyHint;
+
+  /// Verilirse her hamlenin yanında sınıf simgesi gösterilir.
+  final MoveQuality? Function(int index)? qualityOf;
 
   @override
   State<MoveTable> createState() => _MoveTableState();
@@ -137,14 +143,23 @@ class _MoveTableState extends State<MoveTable> {
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Text(
-            record.san,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
-              color: isCurrent
-                  ? theme.colorScheme.onPrimaryContainer
-                  : theme.colorScheme.onSurface,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.qualityOf?.call(index) case final quality?) ...[
+                Icon(quality.icon, size: 13, color: quality.color),
+                const SizedBox(width: 3),
+              ],
+              Text(
+                record.san,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+                  color: isCurrent
+                      ? theme.colorScheme.onPrimaryContainer
+                      : theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
           ),
         ),
       ),

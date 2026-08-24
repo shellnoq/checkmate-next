@@ -7,8 +7,12 @@ import 'package:checkmate_next/engine/engine_models.dart';
 /// Testlerde native Stockfish yerine geçen motor. Hiç hamle üretmez; amacı
 /// arayüz testlerinin gerçek motoru başlatmaya çalışmasını önlemektir.
 class FakeEngine implements ChessEngine {
-  final ValueNotifier<EngineStatus> _status =
-      ValueNotifier(EngineStatus.ready);
+  FakeEngine({this.onSearch});
+
+  /// Verilirse her aramada çağrılır; sonuçlar buradan kurgulanır.
+  SearchResult Function(String fen, List<String> movesUci)? onSearch;
+
+  final ValueNotifier<EngineStatus> _status = ValueNotifier(EngineStatus.ready);
   final StreamController<EngineLine> _info =
       StreamController<EngineLine>.broadcast();
 
@@ -33,7 +37,8 @@ class FakeEngine implements ChessEngine {
     required SearchLimits limits,
   }) async {
     searchCount++;
-    return const SearchResult(bestMoveUci: null);
+    return onSearch?.call(fen, movesUci) ??
+        const SearchResult(bestMoveUci: null);
   }
 
   @override

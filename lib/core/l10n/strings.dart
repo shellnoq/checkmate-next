@@ -102,6 +102,22 @@ class S {
   String get about => _('Hakkında', 'About');
   String get resetStats => _('İstatistikleri sıfırla', 'Reset statistics');
 
+  // Tekrar ve analiz
+  String get replay => _('Maç Tekrarı', 'Replay');
+  String get analyze => _('Analiz Et', 'Analyse');
+  String get qualityBook => _('Kitap hamlesi', 'Book move');
+  String get qualityBrilliant => _('Çok iyi', 'Excellent');
+  String get qualityGood => _('İyi', 'Good');
+  String get qualityDubious => _('Şüpheli', 'Dubious');
+  String get qualityBad => _('Kötü', 'Mistake');
+  String get noReplayData =>
+      _('Bu oyunda tekrar kaydı yok', 'This game has no replay data');
+  String get openingLibrary => _('Açılış Kütüphanesi', 'Opening Library');
+  String get categoryOpen => _('Açık Oyunlar', 'Open Games');
+  String get categorySemiOpen => _('Yarı Açık Oyunlar', 'Semi-Open Games');
+  String get categoryClosed => _('Kapalı Oyunlar', 'Closed Games');
+  String get categoryFlank => _('Kanat Açılışları', 'Flank Openings');
+
   // Ebeveyn bölümü
   String get parentArea => _('Ebeveyn Bölümü', 'Parent Area');
   String get parentAreaSub =>
